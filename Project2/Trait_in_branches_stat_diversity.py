@@ -28,12 +28,17 @@ def sigma(a, zi, zj, nj):
 
 num_time = 2000
 j = 0
-
-num_vec = np.arange(2,402,2)
+num_species = 100
+num_vec = np.arange(1,1001,1)
 nrow = len(num_vec)
-stat_rate = np.empty((nrow,2))
-for num_species in num_vec:
-    np.random.seed(29)
+stat_rate_trait_BH = np.empty((nrow,num_species))
+stat_rate_trait_RI = np.empty((nrow,num_species))
+
+stat_rate_popu_BH = np.empty((nrow,num_species))
+stat_rate_popu_RI = np.empty((nrow,num_species))
+
+for loop in num_vec:
+    np.random.seed(loop)
     print(j)
     trait_BH = np.zeros((num_time+1, num_species))
     population_BH = np.zeros((num_time+1, num_species))
@@ -74,11 +79,13 @@ for num_species in num_vec:
     # p = plt.plot(x, y, "o")
 
     # Diversity statistics
-    stat_rate[j,0] =len(np.where(population_BH[num_time,] == 0)[0])/ ((j+1)*2)
-    stat_rate[j, 1] = len(np.where(population_RI[num_time,] == 0)[0]) / ((j+1) * 2)
+    stat_rate_trait_BH[j,:] =trait_BH[num_time,:]
+    stat_rate_trait_RI[j, :] = trait_RI[num_time, :]
+    stat_rate_popu_BH[j, :] = population_BH[num_time, :]
+    stat_rate_popu_RI[j, :] = population_RI[num_time, :]
     j += 1
 
 
 
-plt.plot(num_vec, stat_rate[:,0], 'r--',num_vec, stat_rate[:,1], 'b--')
+# plt.plot(num_vec, stat_rate[:,0], 'r--',num_vec, stat_rate[:,1], 'b--')
 
