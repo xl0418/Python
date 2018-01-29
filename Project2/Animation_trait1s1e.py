@@ -158,6 +158,18 @@ ax01.set_xlabel("")
 ax01.set_ylabel("Trait Value")
 ax02.set_xlabel("Generation")
 ax02.set_ylabel("Trait Value")
+
+popu_BH_spec1_text = ax01.text(0.8,0.9, '', transform = ax01.transAxes)
+popu_BH_spec2_text = ax01.text(0.8,0.85, '', transform = ax01.transAxes)
+popu_BH_spec3_text = ax01.text(0.8,0.8, '', transform = ax01.transAxes)
+
+
+popu_RI_spec1_text = ax02.text(0.8,0.4,'', transform = ax02.transAxes)
+popu_RI_spec2_text = ax02.text(0.8,0.35, '', transform = ax02.transAxes)
+popu_RI_spec3_text = ax02.text(0.8,0.3, '' ,transform = ax02.transAxes)
+
+
+
 # ax03.set_xlabel("t")
 # ax03.set_ylabel("py")
 # ax04.set_ylabel("vy")
@@ -222,6 +234,16 @@ def animate(i):
     RI_scatter2.set_sizes([RI_size2[i]])
     BH_scatter3.set_sizes([BH_size3[i]])
     RI_scatter3.set_sizes([RI_size3[i]])
+
+    # Animating labels
+    popu_BH_spec1_text.set_text('Pop of Spec 1 = %.1f' % population_BH[i,0])
+    popu_BH_spec2_text.set_text('Pop of Spec 2 = %.1f' % population_BH[i,1])
+    popu_BH_spec3_text.set_text('Pop of Spec 3 = %.1f' % population_BH[i,2])
+
+    popu_RI_spec1_text.set_text('Pop of Spec 1 = %.1f' % population_RI[i,0])
+    popu_RI_spec2_text.set_text('Pop of Spec 2 = %.1f' % population_RI[i,1])
+    popu_RI_spec3_text.set_text('Pop of Spec 3 = %.1f' % population_RI[i,2])
+
     if (i < 2000):
         BH_line3.set_data([], [])
         RI_line3.set_data([], [])
@@ -246,9 +268,11 @@ def animate(i):
 time_template = 'Time = %d G'    # prints running simulation time
 time_text = ax01.text(0.05, 0.9, '', transform=ax01.transAxes)
 
+
+
 ani = animation.FuncAnimation(f0, animate, interval= 1, frames= 6000, repeat=False, blit=False) #, init_func=init)
 plt.show()
 #
 # Writer = animation.writers['ffmpeg']
 # writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-# ani.save('C:\\Liang\\Googlebox\\Python\\Project2\\S+C.mp4', writer=writer)
+# ani.save('/Users/dudupig/Google 云端硬盘/Python/Project2/S+C.mp4', writer=writer)
