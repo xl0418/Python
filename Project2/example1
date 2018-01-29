@@ -1,0 +1,20 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def graph(formula1,formula2, x_range):
+    x = np.array(x_range)
+    y1 = formula1(x)  # <- note now we're calling the function 'formula' with x
+    y2 = formula2(x)
+    plt.subplot(211)
+    plt.plot(x, y1)
+    plt.subplot(212)
+    plt.plot(x, y2)
+    plt.show()
+
+def ricker(x):
+    return np.exp(2*(1-x/300))
+def bh(x):
+    return 2*300/(300+x)
+
+graph(ricker,bh, range(1, 400))
+
