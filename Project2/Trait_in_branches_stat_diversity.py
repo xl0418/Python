@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 
 theta = 0   # optimum of natural selection
 gamma = 0.01 # intensity of natural selection
@@ -85,7 +86,18 @@ for loop in num_vec:
     stat_rate_popu_RI[j, :] = population_RI[num_time, :]
     j += 1
 
+ext_index_BH = np.where(stat_rate_popu_BH == 0)
+ext_index_RI = np.where(stat_rate_popu_RI == 0)
+color_BH = dict(boxes='DarkGreen', whiskers='DarkOrange', medians='DarkBlue', caps='Gray')
+statplot_trait_BH = stat_rate_trait_BH
+statplot_trait_BH[ext_index_BH[0],ext_index_BH[1]] = np.nan
+statplot_trait_BH_sorted = np.sort(statplot_trait_BH)
+df_BH = pd.DataFrame(statplot_trait_BH_sorted)
+df_BH.plot.box(rot=90, color = color_BH)
 
-
-# plt.plot(num_vec, stat_rate[:,0], 'r--',num_vec, stat_rate[:,1], 'b--')
-
+color_RI = dict(boxes='DarkRed', whiskers='DarkBlue', medians='DarkBlue', caps='Gray')
+statplot_trait_RI = stat_rate_trait_RI
+statplot_trait_RI[ext_index_RI[0],ext_index_RI[1]] = np.nan
+statplot_trait_RI_sorted = np.sort(statplot_trait_RI)
+df_RI = pd.DataFrame(statplot_trait_RI_sorted)
+df_RI.boxplot(rot=90)
