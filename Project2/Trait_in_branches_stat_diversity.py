@@ -93,11 +93,63 @@ statplot_trait_BH = stat_rate_trait_BH
 statplot_trait_BH[ext_index_BH[0],ext_index_BH[1]] = np.nan
 statplot_trait_BH_sorted = np.sort(statplot_trait_BH)
 df_BH = pd.DataFrame(statplot_trait_BH_sorted)
-df_BH.plot.box(rot=90, color = color_BH)
+# df_BH.plot.box(rot=90, color = color_BH, layout = (2,1), showfliers=False)
 
 color_RI = dict(boxes='DarkRed', whiskers='DarkBlue', medians='DarkBlue', caps='Gray')
 statplot_trait_RI = stat_rate_trait_RI
 statplot_trait_RI[ext_index_RI[0],ext_index_RI[1]] = np.nan
 statplot_trait_RI_sorted = np.sort(statplot_trait_RI)
 df_RI = pd.DataFrame(statplot_trait_RI_sorted)
-df_RI.boxplot(rot=90)
+# df_RI.plot.box(rot=90,  color = color_RI, layout = (2,2), showfliers=False)
+# Create a figure instance
+fig = plt.figure(1, figsize=(9, 6))
+# Create an axes instance
+ax = fig.add_subplot(111)
+bh = ax.boxplot(df_BH.dropna().values, 0 , "", patch_artist=True)
+## change outline color, fill color and linewidth of the boxes
+for box in bh['boxes']:
+    # change outline color
+    box.set( color='DarkBlue', linewidth=0.5)
+    # change fill color
+    box.set( facecolor = '#95d0fc' ,  alpha=0.5)
+
+## change color and linewidth of the whiskers
+for whisker in bh['whiskers']:
+    whisker.set(color='#95d0fc', linewidth=0.5)
+
+## change color and linewidth of the caps
+for cap in bh['caps']:
+    cap.set(color='#95d0fc', linewidth=0.5)
+
+## change color and linewidth of the medians
+for median in bh['medians']:
+    median.set(color='#95d0fc', linewidth=0.5)
+
+## change the style of fliers and their fill
+for flier in bh['fliers']:
+    flier.set(marker='o', color='#95d0fc', alpha=0.5)
+
+
+ri = ax.boxplot(df_RI.dropna().values, 0 , "", patch_artist=True)
+## change outline color, fill color and linewidth of the boxes
+for box in ri['boxes']:
+    # change outline color
+    box.set( color='#ff000d', linewidth=0.5)
+    # change fill color
+    box.set( facecolor = '#fc5a50' ,  alpha=0.5)
+
+## change color and linewidth of the whiskers
+for whisker in ri['whiskers']:
+    whisker.set(color='#fc5a50', linewidth=0.5)
+
+## change color and linewidth of the caps
+for cap in ri['caps']:
+    cap.set(color='#fc5a50', linewidth=0.5)
+
+## change color and linewidth of the medians
+for median in ri['medians']:
+    median.set(color='#fc5a50', linewidth=0.5)
+
+## change the style of fliers and their fill
+for flier in ri['fliers']:
+    flier.set(marker='o', color='#fc5a50', alpha=0.5)
