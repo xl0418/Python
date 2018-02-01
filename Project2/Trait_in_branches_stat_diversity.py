@@ -30,7 +30,7 @@ def sigma(a, zi, zj, nj):
 num_time = 2000
 j = 0
 num_species = 100
-num_vec = np.arange(1,1001,1)
+num_vec = np.arange(1,11,1)
 nrow = len(num_vec)
 stat_rate_trait_BH = np.empty((nrow,num_species))
 stat_rate_trait_RI = np.empty((nrow,num_species))
@@ -92,20 +92,20 @@ color_BH = dict(boxes='DarkGreen', whiskers='DarkOrange', medians='DarkBlue', ca
 statplot_trait_BH = stat_rate_trait_BH
 statplot_trait_BH[ext_index_BH[0],ext_index_BH[1]] = np.nan
 statplot_trait_BH_sorted = np.sort(statplot_trait_BH)
-df_BH = pd.DataFrame(statplot_trait_BH_sorted)
-# df_BH.plot.box(rot=90, color = color_BH, layout = (2,1), showfliers=False)
+
 
 color_RI = dict(boxes='DarkRed', whiskers='DarkBlue', medians='DarkBlue', caps='Gray')
 statplot_trait_RI = stat_rate_trait_RI
 statplot_trait_RI[ext_index_RI[0],ext_index_RI[1]] = np.nan
 statplot_trait_RI_sorted = np.sort(statplot_trait_RI)
-df_RI = pd.DataFrame(statplot_trait_RI_sorted)
-# df_RI.plot.box(rot=90,  color = color_RI, layout = (2,2), showfliers=False)
-# Create a figure instance
+
+
+mask_BH = ~np.isnan(statplot_trait_BH_sorted)
+filtered_data_BH = [d[m] for d, m in zip(statplot_trait_BH_sorted.T, mask_BH.T)]
 fig = plt.figure(1, figsize=(9, 6))
 # Create an axes instance
 ax = fig.add_subplot(111)
-bh = ax.boxplot(df_BH.dropna().values, 0 , "", patch_artist=True)
+bh = ax.boxplot(filtered_data_BH, 0 , "", patch_artist=True)
 ## change outline color, fill color and linewidth of the boxes
 for box in bh['boxes']:
     # change outline color
@@ -129,8 +129,9 @@ for median in bh['medians']:
 for flier in bh['fliers']:
     flier.set(marker='o', color='#95d0fc', alpha=0.5)
 
-
-ri = ax.boxplot(df_RI.dropna().values, 0 , "", patch_artist=True)
+mask_RI = ~np.isnan(statplot_trait_RI_sorted)
+filtered_data_RI = [d[m] for d, m in zip(statplot_trait_RI_sorted.T, mask_RI.T)]
+ri = ax.boxplot(filtered_data_RI, 0 , "", patch_artist=True)
 ## change outline color, fill color and linewidth of the boxes
 for box in ri['boxes']:
     # change outline color
@@ -153,3 +154,4 @@ for median in ri['medians']:
 ## change the style of fliers and their fill
 for flier in ri['fliers']:
     flier.set(marker='o', color='#fc5a50', alpha=0.5)
+
