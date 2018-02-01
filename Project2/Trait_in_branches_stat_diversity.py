@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
-import pandas as pd
-
+import matplotlib.gridspec as gridspec
 theta = 0   # optimum of natural selection
 gamma = 0.01 # intensity of natural selection
 r = 1  # growth rate
@@ -30,7 +28,7 @@ def sigma(a, zi, zj, nj):
 num_time = 2000
 j = 0
 num_species = 100
-num_vec = np.arange(1,11,1)
+num_vec = np.arange(1,101,1)
 nrow = len(num_vec)
 stat_rate_trait_BH = np.empty((nrow,num_species))
 stat_rate_trait_RI = np.empty((nrow,num_species))
@@ -73,11 +71,6 @@ for loop in num_vec:
         trait_RI[i+1] = trait_RI[i] + 2*gamma * (theta - trait_RI[i]) * Gamma_RI * (1 - Beta_RI/K) + Gamma_RI  * Sigma_RI / K
         population_RI[i+1] = population_RI[i] * np.exp(Gamma_RI*(1-Beta_RI/K))
         population_RI[i+1,np.where(population_RI[i+1]<1)] = 0
-    # print(population[:,1])
-    #
-    # x = range(0, 1001)
-    # y = population[:,1]
-    # p = plt.plot(x, y, "o")
 
     # Diversity statistics
     stat_rate_trait_BH[j,:] =trait_BH[num_time,:]
@@ -88,13 +81,9 @@ for loop in num_vec:
 
 ext_index_BH = np.where(stat_rate_popu_BH == 0)
 ext_index_RI = np.where(stat_rate_popu_RI == 0)
-color_BH = dict(boxes='DarkGreen', whiskers='DarkOrange', medians='DarkBlue', caps='Gray')
 statplot_trait_BH = stat_rate_trait_BH
 statplot_trait_BH[ext_index_BH[0],ext_index_BH[1]] = np.nan
 statplot_trait_BH_sorted = np.sort(statplot_trait_BH)
-
-
-color_RI = dict(boxes='DarkRed', whiskers='DarkBlue', medians='DarkBlue', caps='Gray')
 statplot_trait_RI = stat_rate_trait_RI
 statplot_trait_RI[ext_index_RI[0],ext_index_RI[1]] = np.nan
 statplot_trait_RI_sorted = np.sort(statplot_trait_RI)
@@ -102,10 +91,27 @@ statplot_trait_RI_sorted = np.sort(statplot_trait_RI)
 
 mask_BH = ~np.isnan(statplot_trait_BH_sorted)
 filtered_data_BH = [d[m] for d, m in zip(statplot_trait_BH_sorted.T, mask_BH.T)]
-fig = plt.figure(1, figsize=(9, 6))
+mask_RI = ~np.isnan(statplot_trait_RI_sorted)
+filtered_data_RI = [d[m] for d, m in zip(statplot_trait_RI_sorted.T, mask_RI.T)]
+merge_BH = np.concatenate( filtered_data_BH, axis=0 )
+merge_RI = np.concatenate( filtered_data_RI, axis=0 )
+
+
+
+fig = plt.figure(1, figsize=(12, 9))
+# plt.xticks(rotation=90)
+min_BH = np.amin(merge_BH)-5
+max_BH = np.amax(merge_BH)+5
+min_RI = np.amin(merge_RI)-5
+max_RI = np.amax(merge_RI)+5
+global_min = min(min_BH, min_RI)
+global_max = max(max_BH, max_RI)
+
+gs = gridspec.GridSpec(1, 4)
+
 # Create an axes instance
-ax = fig.add_subplot(111)
-bh = ax.boxplot(filtered_data_BH, 0 , "", patch_artist=True)
+ax1 = fig.add_subplot(gs[0,:-2])
+bh = ax1.boxplot(filtered_data_BH, 0 , "", patch_artist=True)
 ## change outline color, fill color and linewidth of the boxes
 for box in bh['boxes']:
     # change outline color
@@ -129,9 +135,9 @@ for median in bh['medians']:
 for flier in bh['fliers']:
     flier.set(marker='o', color='#95d0fc', alpha=0.5)
 
-mask_RI = ~np.isnan(statplot_trait_RI_sorted)
-filtered_data_RI = [d[m] for d, m in zip(statplot_trait_RI_sorted.T, mask_RI.T)]
-ri = ax.boxplot(filtered_data_RI, 0 , "", patch_artist=True)
+
+ri = ax1.boxplot(filtered_data_RI, 0 , "", patch_artist=True)
+
 ## change outline color, fill color and linewidth of the boxes
 for box in ri['boxes']:
     # change outline color
@@ -155,3 +161,80 @@ for median in ri['medians']:
 for flier in ri['fliers']:
     flier.set(marker='o', color='#fc5a50', alpha=0.5)
 
+# add legends
+ax1.legend([bh["boxes"][0], ri["boxes"][0]], ['BH', 'RI'], loc='upper left')
+# add title
+ax1.set_title('Trait distribution')
+# add x label and y label
+ax1.set_xlabel('Species ordered by trait values')
+ax1.set_ylabel('Trait values')
+ax1.set_ylim(global_min,global_max)
+
+# Major ticks every 20, minor ticks every 5
+major_ticks_x = np.arange(0, 101, 20)
+minor_ticks_x = np.arange(0, 101, 1)
+major_ticks_y = np.arange(-30, 31, 10)
+minor_ticks_y = np.arange(-30, 31, 1)
+
+ax1.set_xticks(major_ticks_x)
+ax1.set_xticklabels(major_ticks_x)
+ax1.set_xticks(minor_ticks_x, minor=True)
+ax1.set_yticks(major_ticks_y)
+ax1.set_yticks(minor_ticks_y, minor=True)
+
+# And a corresponding grid
+# ax.grid(which='both')
+
+# Or if you want different settings for the grids:
+ax1.grid(which='minor', alpha=0.2)
+ax1.grid(which='major', alpha=0.5)
+
+
+ax2 = fig.add_subplot(gs[0, 2])
+# ax2.spines["top"].set_visible(False)
+# ax2.spines["right"].set_visible(False)
+# ax2.spines["left"].set_visible(False)
+# ax2.get_xaxis().set_ticks([])
+# ax2.get_yaxis().set_ticks([])
+ax2.set_title('BH model')
+# add x label and y label
+ax2.set_xlabel('Count')
+# ax1.set_ylabel('Trait values')
+major_ticks_x2 = np.arange(0, 41, 10)
+
+ax2.set_xticks(major_ticks_x2)
+ax2.set_xticklabels(major_ticks_x2)
+ax2.set_ylim(global_min,global_max)
+# ax2.axes.get_xaxis().set_ticklabels([])
+ax2.axes.get_yaxis().set_ticklabels([])
+ax2.hist(merge_BH, bins = 100, color="#95d0fc", alpha=0.5, orientation='horizontal')
+
+
+ax3 = fig.add_subplot(gs[0, 3])
+# ax3.spines["top"].set_visible(False)
+# ax3.spines["right"].set_visible(False)
+# ax3.spines["left"].set_visible(False)
+ax3.set_title('RI model')
+# add x label and y label
+ax3.set_xlabel('Count')
+major_ticks_x3 = np.arange(0, 41, 10)
+
+ax3.set_xticks(major_ticks_x3)
+ax3.set_xticklabels(major_ticks_x3)
+ax3.set_ylim(global_min,global_max)
+# ax3.axes.get_xaxis().set_ticklabels([])
+ax3.axes.get_yaxis().set_ticklabels([])
+ax3.hist(merge_RI, bins = 100, color="#fc5a50",alpha=0.5, orientation='horizontal')
+
+import os
+script_dir = os.path.dirname('__file__')
+results_dir = os.path.join(script_dir, 'resultes/')
+name = "species1btime2qsim1b"
+sample_file_name = "%s.pdf" % name
+
+if not os.path.isdir(results_dir):
+    os.makedirs(results_dir)
+
+plt.savefig(results_dir + sample_file_name)
+
+plt.close(fig)
