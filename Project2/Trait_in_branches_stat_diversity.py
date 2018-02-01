@@ -23,7 +23,7 @@ def sigma(a, zi, zj, nj):
     return zi_ret
 
 # Trait simulation function under both Beverton-Holt model and Ricker model
-def traitsim(num_time, num_species, num_iteration, gamma, a, r, theta, mean_trait, dev_trait, mean_pop, dev_pop):
+def traitsim(num_time, num_species, num_iteration, gamma, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
     j = 0   # initialize the iteration number
     num_vec = np.arange(1,(num_iteration+1),1) # iteration vector
     nrow = len(num_vec)    # Row number of the trait evolution history matrix
@@ -252,24 +252,27 @@ gamma_vec = a_vec
 # parameter settings
 r = 1
 theta = 0
+K = 3000
 num_time = 2000
 num_species = 100
 num_iteration = 10
+count1 = 1
+count2 = 1
 
 # statistics for settings
 for gamma in gamma_vec:
     for a in a_vec:
         traitdata = traitsim(num_time = num_time, num_species= num_species, num_iteration= num_iteration,
-                             gamma = gamma, a = a, r= r, theta = theta, mean_trait= 0, dev_trait=10, mean_pop= 50,
+                             gamma = gamma, a = a, r= r,K = K, theta = theta, mean_trait= 0, dev_trait=10, mean_pop= 50,
                              dev_pop= 10)
         fig = drawplot(traitdata = traitdata)
 
-        par = (num_species,num_time,num_iteration)
+        par = (num_species,num_time,num_iteration,count1,count2)
         # detect the current dir
         script_dir = os.path.dirname('__file__')
         results_dir = os.path.join(script_dir, 'resultes/')
         # file names
-        name = "species%d-time%d-sim%d" % par
+        name = "species%d-time%d-sim%d-com%d-nat%d" % par
         file_name = "%s.pdf" % name
         # if dir doesn't exist, create it
         if not os.path.isdir(results_dir):
@@ -278,3 +281,5 @@ for gamma in gamma_vec:
         plt.savefig(results_dir + file_name)
         # close the windows showing figs
         plt.close(fig)
+        count2 +=1
+    count1 +=1
