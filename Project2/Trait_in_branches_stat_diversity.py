@@ -255,7 +255,7 @@ theta = 0
 K = 3000
 num_time = 2000
 num_species = 100
-num_iteration = 10
+num_iteration = 100
 count1 = 1
 count2 = 1
 
@@ -266,7 +266,6 @@ for gamma in gamma_vec:
                              gamma = gamma, a = a, r= r,K = K, theta = theta, mean_trait= 0, dev_trait=10, mean_pop= 50,
                              dev_pop= 10)
         fig = drawplot(traitdata = traitdata)
-
         par = (num_species,num_time,num_iteration,count1,count2)
         # detect the current dir
         script_dir = os.path.dirname('__file__')
