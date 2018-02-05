@@ -272,7 +272,7 @@ time_text = ax01.text(0.05, 0.9, '', transform=ax01.transAxes)
 
 ani = animation.FuncAnimation(f0, animate, interval= 1, frames= 6000, repeat=False, blit=False) #, init_func=init)
 plt.show()
-#
-# Writer = animation.writers['ffmpeg']
-# writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-# ani.save('/Users/dudupig/Google 云端硬盘/Python/Project2/S+C.mp4', writer=writer)
+
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+ani.save('/Users/dudupig/Google 云端硬盘/Python/Project2/S+C.mp4', writer=writer)

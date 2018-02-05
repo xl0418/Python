@@ -252,6 +252,103 @@ def drawplot(traitdata):
     return fig
 
 
+# trait 1 v.s. trait 2 dotplot
+def dotplot(traitdata):
+    # read simulated data
+    stat_rate_trait_BH = traitdata[0]
+    stat_rate_trait_RI = traitdata[1]
+    stat_rate_popu_BH = traitdata[2]
+    stat_rate_popu_RI = traitdata[3]
+
+    # find out extinct species and remove the responding trait values
+    ext_index_BH = np.where(stat_rate_popu_BH == 0)
+    ext_index_RI = np.where(stat_rate_popu_RI == 0)
+    statplot_trait_BH = stat_rate_trait_BH
+    statplot_trait_BH[ext_index_BH[0],ext_index_BH[1]] = np.nan
+    # statplot_trait_BH_sorted = np.sort(statplot_trait_BH)
+    statplot_trait_RI = stat_rate_trait_RI
+    statplot_trait_RI[ext_index_RI[0],ext_index_RI[1]] = np.nan
+    # statplot_trait_RI_sorted = np.sort(statplot_trait_RI)
+    # filter the missing data
+    mask_BH = ~np.isnan(statplot_trait_BH)
+    filtered_data_BH = [d[m] for d, m in zip(statplot_trait_BH.T, mask_BH.T)]
+    mask_RI = ~np.isnan(statplot_trait_RI)
+    filtered_data_RI = [d[m] for d, m in zip(statplot_trait_RI.T, mask_RI.T)]
+    # convert the list to an array
+    merge_BH = np.concatenate(filtered_data_BH, axis=0)
+    merge_RI = np.concatenate(filtered_data_RI, axis=0)
+
+    statplot_popu_BH = stat_rate_popu_BH
+    statplot_popu_BH[ext_index_BH[0], ext_index_BH[1]] = np.nan
+    # statplot_popu_BH_sorted = np.sort(statplot_popu_BH)
+    statplot_popu_RI = stat_rate_popu_RI
+    statplot_popu_RI[ext_index_RI[0], ext_index_RI[1]] = np.nan
+    # statplot_popu_RI_sorted = np.sort(statplot_popu_RI)
+
+    # filter the missing data
+    mask_popu_BH = ~np.isnan(statplot_popu_BH)
+    filtered_popu_data_BH = [d[m] for d, m in zip(statplot_popu_BH.T, mask_popu_BH.T)]
+    mask_popu_RI = ~np.isnan(statplot_popu_RI)
+    filtered_popu_data_RI = [d[m] for d, m in zip(statplot_popu_RI.T, mask_popu_RI.T)]
+    # convert the list to an array
+    merge_popu_BH = np.concatenate(filtered_popu_data_BH, axis=0)
+    merge_popu_RI = np.concatenate(filtered_popu_data_RI, axis=0)
+
+
+    # create a fig
+    fig = plt.figure(1, figsize=(12, 9))
+    # determine the limits for axises
+    min_BH_t = np.amin(merge_BH)-5
+    max_BH_t = np.amax(merge_BH)+5
+    min_RI_t = np.amin(merge_RI)-5
+    max_RI_t = np.amax(merge_RI)+5
+    global_min_t = min(min_BH_t, min_RI_t)
+    global_max_t = max(max_BH_t, max_RI_t)
+
+    min_BH_p = np.amin(merge_popu_BH) - 5
+    max_BH_p = np.amax(merge_popu_BH) + 5
+    min_RI_p = np.amin(merge_popu_RI) - 5
+    max_RI_p = np.amax(merge_popu_RI) + 5
+    global_min_p = min(min_BH_p, min_RI_p)
+    global_max_p = max(max_BH_p, max_RI_p)
+    # multiple plots arrangement
+    gs = gridspec.GridSpec(1, 2)
+
+    # Create an axes instance
+    ax1 = fig.add_subplot(gs[0,0])
+    # boxplot BH trait data
+    bh = ax1.scatter(merge_popu_BH, merge_BH, s=10, c = "#95d0fc", marker='o', alpha = 0.5)
+
+    # add legends
+    # ax1.legend([bh["boxes"][0], ri["boxes"][0]], ['BH', 'RI'], loc='upper left')
+    # add title
+    ax1.set_title('Trait v.s. Population under BH')
+    # add x label and y label
+    ax1.set_xlabel('Population size')
+    ax1.set_ylabel('Trait values')
+    ax1.set_ylim(global_min_t,global_max_t)
+
+    # Create an axes instance
+    ax2 = fig.add_subplot(gs[0, 1])
+    # boxplot BH trait data
+    ri = ax2.scatter(merge_popu_RI, merge_RI, s=10, c="#fc5a50", marker='o', alpha=0.5)
+
+    # add legends
+    # ax1.legend([bh["boxes"][0], ri["boxes"][0]], ['BH', 'RI'], loc='upper left')
+    # add title
+    ax2.set_title('Trait v.s. Population under RI')
+    # add x label and y label
+    ax2.set_xlabel('Population size')
+    ax2.set_ylabel('')
+    ax2.set_ylim(global_min_t, global_max_t)
+
+    plt.show()
+    return fig
+
+
+
+
+
 
 # competition rate vector
 a_vec = np.array([0.01,0.05,0.1,0.5,1])
@@ -293,3 +390,6 @@ for gamma in gamma_vec:
         plt.close(fig)
         count2 +=1
     count1 +=1
+
+
+dotfig = dotplot(traitdata = traitdata)
