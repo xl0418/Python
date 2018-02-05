@@ -8,6 +8,11 @@ import os
 def ga(gamma, theta, zi, r):
     return r * np.exp(-gamma * (theta - zi) ** 2)
 
+# Dynamic carrying capacity
+def Kd(gamma_K, theta, zi, K):
+    return max(K * np.exp(-gamma_K * (theta - zi) ** 2),1)
+
+
 # Competition function
 def beta(a, zi, zj, nj):
     zi_ret = np.ndarray((1,len(zi)))
@@ -23,7 +28,7 @@ def sigma(a, zi, zj, nj):
     return zi_ret
 
 # Trait simulation function under both Beverton-Holt model and Ricker model
-def traitsim(num_time, num_species, num_iteration, gamma, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
+def traitsim(num_time, num_species, num_iteration, gamma, gamma_K, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
     j = 0   # initialize the iteration number
     num_vec = np.arange(1,(num_iteration+1),1) # iteration vector
     nrow = len(num_vec)    # Row number of the trait evolution history matrix
@@ -32,6 +37,9 @@ def traitsim(num_time, num_species, num_iteration, gamma, a, r, theta,K , mean_t
 
     stat_rate_popu_BH = np.empty((nrow,num_species))  # population evolution matrix under BH
     stat_rate_popu_RI = np.empty((nrow,num_species)) # population evolution matrix under RI
+    # vectorize ga function
+    ga_vector = np.vectorize(ga)
+    Kd_vector = np.vectorize(Kd)
 
     # loop for preset iteration
     for loop in num_vec:
@@ -50,27 +58,28 @@ def traitsim(num_time, num_species, num_iteration, gamma, a, r, theta,K , mean_t
         mu_pop, sigma_pop = mean_pop, dev_pop  # mean and standard deviation
         population_BH[0] = np.random.normal(mu_pop, sigma_pop, num_species)
         population_RI[0] = population_BH[0]
-        # vectorize ga function
-        ga_vector = np.vectorize(ga)
+
 
         # trait evolution simulation
         for i in range(num_time):
             # BH model
             Gamma_BH = ga_vector(gamma=gamma, theta=theta, zi=trait_BH[i], r=r)
+            K_BH = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_BH[i], K=K)
             Beta_BH = beta(a=a, zi=trait_BH[i], zj=trait_BH[i], nj=population_BH[i])
             Sigma_BH = sigma(a=a, zi=trait_BH[i], zj=trait_BH[i], nj=population_BH[i])
             trait_BH[i + 1] = trait_BH[i] + 2 * gamma * (theta - trait_BH[i]) * Gamma_BH * (
-                    1 - np.exp(Gamma_BH) * Beta_BH / (K + (np.exp(Gamma_BH) - 1) * Beta_BH)) \
-                              + (np.exp(Gamma_BH) - 1) * Sigma_BH / (K + (np.exp(Gamma_BH) - 1) * Beta_BH)
-            population_BH[i + 1] = population_BH[i] * np.exp(Gamma_BH) * K / (K + (np.exp(Gamma_BH) - 1) * Beta_BH)
+                    1 - np.exp(Gamma_BH) * Beta_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)) \
+                              + (np.exp(Gamma_BH) - 1) * Sigma_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)
+            population_BH[i + 1] = population_BH[i] * np.exp(Gamma_BH) * K_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)
             population_BH[i + 1, np.where(population_BH[i + 1] < 1)] = 0
 
             #RI model
             Gamma_RI = ga_vector(gamma=gamma, theta=theta, zi=trait_RI[i], r=r)
+            K_RI = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_RI[i], K=K)
             Beta_RI = beta(a=a, zi=trait_RI[i], zj=trait_RI[i], nj=population_RI[i])
             Sigma_RI = sigma(a=a, zi=trait_RI[i], zj=trait_RI[i], nj=population_RI[i])
-            trait_RI[i+1] = trait_RI[i] + 2*gamma * (theta - trait_RI[i]) * Gamma_RI * (1 - Beta_RI/K) + Gamma_RI  * Sigma_RI / K
-            population_RI[i+1] = population_RI[i] * np.exp(Gamma_RI*(1-Beta_RI/K))
+            trait_RI[i+1] = trait_RI[i] + 2*gamma * (theta - trait_RI[i]) * Gamma_RI * (1 - Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI
+            population_RI[i+1] = population_RI[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI))
             population_RI[i+1,np.where(population_RI[i+1]<1)] = 0
 
         # Diversity statistics
@@ -253,25 +262,27 @@ gamma_vec = a_vec
 r = 1
 theta = 0
 K = 3000
+gamma_K = 0.0005
 num_time = 2000
 num_species = 100
 num_iteration = 100
 count1 = 1
-count2 = 1
+
 
 # statistics for settings
 for gamma in gamma_vec:
+    count2 = 1
     for a in a_vec:
         traitdata = traitsim(num_time = num_time, num_species= num_species, num_iteration= num_iteration,
                              gamma = gamma, a = a, r= r,K = K, theta = theta, mean_trait= 0, dev_trait=10, mean_pop= 50,
-                             dev_pop= 10)
+                             dev_pop= 10, gamma_K=gamma_K)
         fig = drawplot(traitdata = traitdata)
         par = (num_species,num_time,num_iteration,count1,count2)
         # detect the current dir
         script_dir = os.path.dirname('__file__')
         results_dir = os.path.join(script_dir, 'resultes/')
         # file names
-        name = "species%d-time%d-sim%d-com%d-nat%d" % par
+        name = "species%d-time%d-sim%d-com%d-nat%d-K0005" % par
         file_name = "%s.pdf" % name
         # if dir doesn't exist, create it
         if not os.path.isdir(results_dir):
