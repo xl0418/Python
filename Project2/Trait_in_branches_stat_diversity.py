@@ -359,12 +359,13 @@ gamma_vec = a_vec
 r = 1
 theta = 0
 K = 3000
-gamma_K = 0.0005
-num_time = 2000
+gamma_K = 0
+num_time = 200
 num_species = 100
 num_iteration = 100
 count1 = 1
 
+import matplotlib.backends.backend_pdf
 
 # statistics for settings
 for gamma in gamma_vec:
@@ -379,7 +380,7 @@ for gamma in gamma_vec:
         script_dir = os.path.dirname('__file__')
         results_dir = os.path.join(script_dir, 'resultes/')
         # file names
-        name = "species%d-time%d-sim%d-com%d-nat%d-K0005" % par
+        name = "species%d-time%d-sim%d-com%d-nat%d-K0" % par
         file_name = "%s.pdf" % name
         # if dir doesn't exist, create it
         if not os.path.isdir(results_dir):
@@ -388,8 +389,14 @@ for gamma in gamma_vec:
         plt.savefig(results_dir + file_name)
         # close the windows showing figs
         plt.close(fig)
+
+        name = "species%d-time%d-sim%d-com%d-nat%d-K0-TV" % par
+        file_name = "%s.pdf" % name
+        dotfig = dotplot(traitdata=traitdata)
+        plt.savefig(results_dir + file_name)
+        plt.close(dotfig)
         count2 +=1
     count1 +=1
 
 
-dotfig = dotplot(traitdata = traitdata)
+# dotfig = dotplot(traitdata = traitdata)
