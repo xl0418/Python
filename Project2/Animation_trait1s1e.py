@@ -21,6 +21,11 @@ def beta(a, zi, zj, nj):
         zi_ret[0,n1] = np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
     return zi_ret
 
+# Dynamic carrying capacity
+def Kd(gamma_K, theta, zi, K):
+    return max(K * np.exp(-gamma_K * (theta - zi) ** 2),1)
+
+
 # Function sigma: the derivative of beta with respect to zi
 def sigma(a, zi, zj, nj):
     zi_ret = np.ndarray((1, len(zi)))
@@ -32,6 +37,7 @@ speciate_time = 2000
 extinction_time = 4000
 evo_time = 6000
 total_species = 3
+gamma_K = 0.005
 # Variance of random walk of trait evolution
 delta_trait = 0.1
 # build trait evolution and population evolution matrices
@@ -52,7 +58,7 @@ print(population_BH[0])
 
 # vectorize function ga
 ga_vector = np.vectorize(ga)
-
+Kd_vector = np.vectorize(Kd)
 # Existing species matrix
 existing_species = np.matrix([[1,1,0], [1,1,1],[1,0,1]])
 speciation_event = np.array([1])
@@ -67,28 +73,29 @@ for i in range(evo_time):
         node = 2
     # num_species = node + 2
     index_existing_species = np.where(existing_species[node] == 1)[1]
-
+    K_BH = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_BH[i], K=K)
     Gamma_BH = ga_vector(gamma=gamma, theta=theta, zi=trait_BH[i,index_existing_species], r=r)
     Beta_BH = beta(a=a, zi=trait_BH[i,index_existing_species], zj=trait_BH[i,index_existing_species],
                    nj=population_BH[i,index_existing_species])
     Sigma_BH = sigma(a=a, zi=trait_BH[i,index_existing_species], zj=trait_BH[i,index_existing_species],
                      nj=population_BH[i,index_existing_species])
     trait_BH[i + 1,index_existing_species] = trait_BH[i,index_existing_species] + 2 * gamma * (theta - trait_BH[i,index_existing_species])\
-                                             * Gamma_BH * ( 1 - np.exp(Gamma_BH) * Beta_BH / (K + (np.exp(Gamma_BH) - 1) * Beta_BH)) \
-                      + (np.exp(Gamma_BH) - 1) * Sigma_BH / (K + (np.exp(Gamma_BH) - 1) * Beta_BH)+ \
+                                             * Gamma_BH * ( 1 - np.exp(Gamma_BH) * Beta_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)) \
+                      + (np.exp(Gamma_BH) - 1) * Sigma_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)+ \
                                                       np.random.normal(0, delta_trait, len(index_existing_species))
-    population_BH[i + 1,index_existing_species] = population_BH[i,index_existing_species] * np.exp(Gamma_BH) * K / (K + (np.exp(Gamma_BH) - 1) * Beta_BH)
+    population_BH[i + 1,index_existing_species] = population_BH[i,index_existing_species] * np.exp(Gamma_BH) * K_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)
     population_BH[i + 1, np.where(population_BH[i + 1] < 1)] = 0
 
     Gamma_RI = ga_vector(gamma=gamma, theta=theta, zi=trait_RI[i,index_existing_species], r=r)
+    K_RI = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_RI[i], K=K)
     Beta_RI = beta(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
                    nj=population_RI[i,index_existing_species])
     Sigma_RI = sigma(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
                      nj=population_RI[i,index_existing_species])
     trait_RI[i+1,index_existing_species] = trait_RI[i,index_existing_species] + 2*gamma * (theta - trait_RI[i,index_existing_species]) \
-                                           * Gamma_RI * (1 - Beta_RI/K) + Gamma_RI  * Sigma_RI / K +\
+                                           * Gamma_RI * (1 - Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI +\
                                            np.random.normal(0, delta_trait, len(index_existing_species))
-    population_RI[i+1,index_existing_species] = population_RI[i,index_existing_species] * np.exp(Gamma_RI*(1-Beta_RI/K))
+    population_RI[i+1,index_existing_species] = population_RI[i,index_existing_species] * np.exp(Gamma_RI*(1-Beta_RI/K_RI))
     population_RI[i+1,np.where(population_RI[i+1]<1)] = 0
 
     if (i+1) == speciate_time:
