@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 
 np.random.seed(29)
 theta = 0   # optimum of natural selection
-gamma = 0.001 # intensity of natural selection
+gamma = 0.01 # intensity of natural selection
 r = 1  # growth rate
-a = 0.001 # intensity of competition
+a = 0.01 # intensity of competition
 K = 3000  # carrying capacity
 
 # Function ga: natural selection
@@ -37,7 +37,7 @@ speciate_time = 2000
 extinction_time = 4000
 evo_time = 6000
 total_species = 3
-gamma_K = 0.005
+gamma_K = 0.05
 # Variance of random walk of trait evolution
 delta_trait = 0.1
 # build trait evolution and population evolution matrices
@@ -73,7 +73,7 @@ for i in range(evo_time):
         node = 2
     # num_species = node + 2
     index_existing_species = np.where(existing_species[node] == 1)[1]
-    K_BH = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_BH[i], K=K)
+    K_BH = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_BH[i,index_existing_species], K=K)
     Gamma_BH = ga_vector(gamma=gamma, theta=theta, zi=trait_BH[i,index_existing_species], r=r)
     Beta_BH = beta(a=a, zi=trait_BH[i,index_existing_species], zj=trait_BH[i,index_existing_species],
                    nj=population_BH[i,index_existing_species])
@@ -87,7 +87,7 @@ for i in range(evo_time):
     population_BH[i + 1, np.where(population_BH[i + 1] < 1)] = 0
 
     Gamma_RI = ga_vector(gamma=gamma, theta=theta, zi=trait_RI[i,index_existing_species], r=r)
-    K_RI = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_RI[i], K=K)
+    K_RI = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_RI[i,index_existing_species], K=K)
     Beta_RI = beta(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
                    nj=population_RI[i,index_existing_species])
     Sigma_RI = sigma(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
