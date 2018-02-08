@@ -7,7 +7,7 @@ np.random.seed(29)
 theta = 0   # optimum of natural selection
 gamma = 0.01 # intensity of natural selection
 r = 1  # growth rate
-a = 0.01 # intensity of competition
+a = 0.1 # intensity of competition
 K = 3000  # carrying capacity
 
 # Function ga: natural selection
@@ -37,7 +37,7 @@ speciate_time = 2000
 extinction_time = 4000
 evo_time = 6000
 total_species = 3
-gamma_K = 0.05
+gamma_K = 0.01
 # Variance of random walk of trait evolution
 delta_trait = 0.1
 # build trait evolution and population evolution matrices
@@ -92,8 +92,8 @@ for i in range(evo_time):
                    nj=population_RI[i,index_existing_species])
     Sigma_RI = sigma(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
                      nj=population_RI[i,index_existing_species])
-    trait_RI[i+1,index_existing_species] = trait_RI[i,index_existing_species] + 2*gamma * (theta - trait_RI[i,index_existing_species]) \
-                                           * Gamma_RI * (1 - Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI +\
+    trait_RI[i+1,index_existing_species] = trait_RI[i,index_existing_species] + 2 * (theta - trait_RI[i,index_existing_species]) \
+                                           * Gamma_RI * (gamma - (r * (gamma - gamma_K))* Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI +\
                                            np.random.normal(0, delta_trait, len(index_existing_species))
     population_RI[i+1,index_existing_species] = population_RI[i,index_existing_species] * np.exp(Gamma_RI*(1-Beta_RI/K_RI))
     population_RI[i+1,np.where(population_RI[i+1]<1)] = 0
