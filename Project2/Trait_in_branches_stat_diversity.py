@@ -78,7 +78,8 @@ def traitsim(num_time, num_species, num_iteration, gamma, gamma_K, a, r, theta,K
             K_RI = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_RI[i], K=K)
             Beta_RI = beta(a=a, zi=trait_RI[i], zj=trait_RI[i], nj=population_RI[i])
             Sigma_RI = sigma(a=a, zi=trait_RI[i], zj=trait_RI[i], nj=population_RI[i])
-            trait_RI[i+1] = trait_RI[i] + 2*gamma * (theta - trait_RI[i]) * Gamma_RI * (1 - Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI
+            trait_RI[i+1] = trait_RI[i] + 2 * (theta - trait_RI[i]) * Gamma_RI * (gamma - r*(gamma - gamma_K)*
+                                                                                  Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI
             population_RI[i+1] = population_RI[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI))
             population_RI[i+1,np.where(population_RI[i+1]<1)] = 0
 
@@ -359,8 +360,8 @@ gamma_vec = a_vec
 r = 1
 theta = 0
 K = 3000
-gamma_K = 0
-num_time = 10000
+# gamma_K = 0.01
+num_time = 2000
 num_species = 100
 num_iteration = 100
 count1 = 1
@@ -369,6 +370,7 @@ import matplotlib.backends.backend_pdf
 
 # statistics for settings
 for gamma in gamma_vec:
+    gamma_K = gamma
     count2 = 1
     for a in a_vec:
         traitdata = traitsim(num_time = num_time, num_species= num_species, num_iteration= num_iteration,
@@ -380,7 +382,7 @@ for gamma in gamma_vec:
         script_dir = os.path.dirname('__file__')
         results_dir = os.path.join(script_dir, 'resultes/')
         # file names
-        name = "species%d-time%d-sim%d-com%d-nat%d-K0" % par
+        name = "species%d-time%d-sim%d-com%d-nat%d-DK" % par
         file_name = "%s.pdf" % name
         # if dir doesn't exist, create it
         if not os.path.isdir(results_dir):
@@ -390,7 +392,7 @@ for gamma in gamma_vec:
         # close the windows showing figs
         plt.close(fig)
 
-        name = "species%d-time%d-sim%d-com%d-nat%d-K0-TV" % par
+        name = "species%d-time%d-sim%d-com%d-nat%d-DK-TV" % par
         file_name = "%s.pdf" % name
         dotfig = dotplot(traitdata=traitdata)
         plt.savefig(results_dir + file_name)

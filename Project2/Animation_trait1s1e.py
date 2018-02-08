@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 np.random.seed(29)
 theta = 0   # optimum of natural selection
-gamma = 0.01 # intensity of natural selection
+gamma = 0.02 # intensity of natural selection
 r = 1  # growth rate
 a = 0.1 # intensity of competition
 K = 3000  # carrying capacity
