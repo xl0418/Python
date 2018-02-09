@@ -26,8 +26,8 @@ def sigma(a, zi, zj, nj):
     return zi_ret
 
 
-num_time = 20000
-num_species = 300
+num_time = 2000
+num_species = 100
 
 trait_BH = np.zeros((num_time+1, num_species))
 population_BH = np.zeros((num_time+1, num_species))
