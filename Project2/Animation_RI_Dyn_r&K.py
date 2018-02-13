@@ -33,9 +33,9 @@ def sigma(a, zi, zj, nj):
         zi_ret[0, n1] = np.sum(2 * a * (zi[n1]-np.array(zj)) * np.exp( -a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
     return zi_ret
 # evolution time: speciation time
-speciate_time = 2000
-extinction_time = 4000
-evo_time = 6000
+speciate_time = 10000
+extinction_time = 20000
+evo_time = 30000
 total_species = 3
 gamma_K = 0.01
 # Variance of random walk of trait evolution
@@ -140,8 +140,8 @@ ax02 = subplot2grid((2, 1), (1, 0))
 # ax03 = subplot2grid((2, 2), (1, 0), colspan=2, rowspan=1)
 # ax04 = ax03.twinx()
 
-ax01.set_title('RI: constant r, dynamtic K')
-ax02.set_title('RI: dynamtic r, constant K')
+ax01.set_title('RI: constant r, dynamic K')
+ax02.set_title('RI: dynamic r, constant K')
 
 
 # set y-limits
