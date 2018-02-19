@@ -29,7 +29,7 @@ def sigma(a, zi, zj, nj):
 num_time = 2000
 j = 0
 a_vec = np.arange(0.01, 1.01, 0.01)
-num_species = 100
+num_species = 2
 nrow = len(a_vec)
 stat_rate = np.empty((nrow,2))
 for a in a_vec:
