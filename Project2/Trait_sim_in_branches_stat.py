@@ -275,10 +275,10 @@ def dotplot(traitdata):
     ext_index_RI_dk = np.where(stat_rate_popu_RI_dk == 0)
     statplot_trait_RI_dr = stat_rate_trait_RI_dr
     statplot_trait_RI_dr[ext_index_RI_dr[0],ext_index_RI_dr[1]] = np.nan
-    statplot_trait_RI_dr_sorted = np.sort(statplot_trait_RI_dr)
+    # statplot_trait_RI_dr_sorted = np.sort(statplot_trait_RI_dr)
     statplot_trait_RI_dk = stat_rate_trait_RI_dk
     statplot_trait_RI_dk[ext_index_RI_dk[0],ext_index_RI_dk[1]] = np.nan
-    statplot_trait_RI_dk_sorted = np.sort(statplot_trait_RI_dk)
+    # statplot_trait_RI_dk_sorted = np.sort(statplot_trait_RI_dk)
     # filter the missing data
     mask_RI_dr = ~np.isnan(statplot_trait_RI_dr)
     filtered_data_RI_dr = [d[m] for d, m in zip(statplot_trait_RI_dr.T, mask_RI_dr.T)]
@@ -290,10 +290,10 @@ def dotplot(traitdata):
 
     statplot_popu_RI_dr = stat_rate_popu_RI_dr
     statplot_popu_RI_dr[ext_index_RI_dr[0], ext_index_RI_dr[1]] = np.nan
-    statplot_popu_RI_dr_sorted = np.sort(statplot_popu_RI_dr)
+    # statplot_popu_RI_dr_sorted = np.sort(statplot_popu_RI_dr)
     statplot_popu_RI_dk = stat_rate_popu_RI_dk
     statplot_popu_RI_dk[ext_index_RI_dk[0], ext_index_RI_dk[1]] = np.nan
-    statplot_popu_RI_sorted = np.sort(statplot_popu_RI_dk)
+    # statplot_popu_RI_sorted = np.sort(statplot_popu_RI_dk)
 
     # filter the missing data
     mask_popu_RI_dr = ~np.isnan(statplot_popu_RI_dr)
@@ -371,8 +371,8 @@ theta = 0
 K = 3000
 # gamma_K = 0.01
 num_time = 2000
-num_species = 2
-num_iteration = 100
+num_species = 100
+num_iteration = 50
 count1 = 1
 
 gamma1 = 0.01
@@ -380,7 +380,7 @@ gamma2 = 0
 gamma_K1 = 0
 gamma_K2 = 0.01
 
-a = 0.01
+a = 0.05
 import matplotlib.backends.backend_pdf
 
 # statistics for settings
