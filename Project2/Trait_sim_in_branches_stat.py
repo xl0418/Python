@@ -28,10 +28,10 @@ def sigma(a, zi, zj, nj):
     return zi_ret
 
 # Trait simulation function under both Beverton-Holt model and Ricker model for dynamic carrying capacity
-def traitsim(num_time, num_species, num_iteration, gamma1,gamma2, gamma_K1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
+def traitsim(num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
     j = 0   # initialize the iteration number
     delta_trait = 0.1
-    delta_pop = 10
+    delta_pop = 0.1
     num_vec = np.arange(1,(num_iteration+1),1) # iteration vector
     nrow = len(num_vec)    # Row number of the trait evolution history matrix
     stat_rate_trait_RI_dr = np.empty((nrow,num_species))   # trait evolution matrix under BH
@@ -71,26 +71,26 @@ def traitsim(num_time, num_species, num_iteration, gamma1,gamma2, gamma_K1,gamma
         for i in range(num_time):
             # RI dynamic r model
             Gamma_RI_dr = ga_vector(gamma=gamma1, theta=theta, zi=trait_RI_dr[i], r=r)
-            K_RI_dr = Kd_vector(gamma_K=gamma_K1, theta=theta, zi=trait_RI_dr[i], K=K)
+            K_RI_dr = K
             Beta_RI_dr = beta(a=a, zi=trait_RI_dr[i], zj=trait_RI_dr[i], nj=population_RI_dr[i])
             Sigma_RI_dr = sigma(a=a, zi=trait_RI_dr[i], zj=trait_RI_dr[i], nj=population_RI_dr[i])
-            trait_RI_dr[i + 1] = trait_RI_dr[i] + 2 * (theta - trait_RI_dr[i]) * Gamma_RI_dr * (1 -
+            trait_RI_dr[i + 1] = trait_RI_dr[i] + 2 *gamma1* (theta - trait_RI_dr[i]) * Gamma_RI_dr * (1 -
                               Beta_RI_dr / K_RI_dr) + Gamma_RI_dr * Sigma_RI_dr / K_RI_dr \
                                  + np.random.normal(0, delta_trait, num_species)
-            population_RI_dr[i + 1] = population_RI_dr[i] * np.exp(Gamma_RI_dr * (1 - Beta_RI_dr / K_RI_dr)) \
-                                      + np.random.normal(0, delta_pop, num_species)
+            population_RI_dr[i + 1] = population_RI_dr[i] * np.exp(Gamma_RI_dr * (1 - Beta_RI_dr / K_RI_dr) \
+                                      + np.random.normal(0, delta_pop, num_species))
             population_RI_dr[i + 1, np.where(population_RI_dr[i + 1] < 1)] = 0
 
             #RI dynamic k model
-            Gamma_RI = ga_vector(gamma=gamma2, theta=theta, zi=trait_RI_dk[i], r=r)
+            Gamma_RI = r
             K_RI = Kd_vector(gamma_K=gamma_K2, theta=theta, zi=trait_RI_dk[i], K=K)
             Beta_RI = beta(a=a, zi=trait_RI_dk[i], zj=trait_RI_dk[i], nj=population_RI_dk[i])
             Sigma_RI = sigma(a=a, zi=trait_RI_dk[i], zj=trait_RI_dk[i], nj=population_RI_dk[i])
-            trait_RI_dk[i+1] = trait_RI_dk[i] + 2 * gamma_K2 * (theta - trait_RI_dk[i]) / K_RI * Beta_RI \
-                                 + Sigma_RI/ K_RI\
+            trait_RI_dk[i+1] = trait_RI_dk[i] + 2 *r* gamma_K2 * (theta - trait_RI_dk[i]) / K_RI * Beta_RI \
+                                 + r * Sigma_RI/ K_RI\
                               +  np.random.normal(0, delta_trait, num_species)
-            population_RI_dk[i+1] = population_RI_dk[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI))\
-                              +  np.random.normal(0, delta_pop, num_species)
+            population_RI_dk[i+1] = population_RI_dk[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI)\
+                              +  np.random.normal(0, delta_pop, num_species))
             population_RI_dk[i+1,np.where(population_RI_dk[i+1]<1)] = 0
 
         # Diversity statistics
@@ -139,8 +139,8 @@ def drawplot(traitdata):
     max_RI_dr = np.amax(merge_RI_dr)+5
     min_RI_dk = np.amin(merge_RI_dk)-5
     max_RI_dk = np.amax(merge_RI_dk)+5
-    global_min =  min(min_RI_dr, min_RI_dk)
-    global_max =  max(max_RI_dr, max_RI_dk)
+    global_min = -50         # min(min_RI_dr, min_RI_dk)
+    global_max = 50          # max(max_RI_dr, max_RI_dk)
     # multiple plots arrangement
     gs = gridspec.GridSpec(1, 4)
 
@@ -211,8 +211,8 @@ def drawplot(traitdata):
     # minor_ticks_x = np.arange(0, num_species+1, 1)
     major_ticks_x = np.arange(0, num_species + 1)
     minor_ticks_x = np.arange(0, num_species + 1)
-    major_ticks_y = np.arange(-30, 31, 10)
-    minor_ticks_y = np.arange(-30, 31, 1)
+    major_ticks_y = np.arange(global_min, global_max, 10)
+    minor_ticks_y = np.arange(global_min, global_max, 1)
 
     ax1.set_xticks(major_ticks_x)
     ax1.set_xticklabels(major_ticks_x)
