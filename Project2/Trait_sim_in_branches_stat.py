@@ -62,7 +62,7 @@ def traitsim(num_time, num_species, num_iteration, gamma1,gamma2, gamma_K1,gamma
         mu_pop, sigma_pop = mean_pop, dev_pop  # mean and standard deviation
         # population_RI_dr[0] = np.random.normal(mu_pop, sigma_pop, num_species)
         pop_ini = np.empty(num_species)
-        pop_ini.fill(10)
+        pop_ini.fill(100)
         population_RI_dr[0] = pop_ini
         population_RI_dk[0] = population_RI_dr[0]
 
@@ -121,7 +121,7 @@ def drawplot(traitdata):
     statplot_trait_RI_dr[ext_index_RI_dr[0],ext_index_RI_dr[1]] = np.nan
     statplot_trait_RI_dr_sorted = np.sort(statplot_trait_RI_dr)
     statplot_trait_RI_dk = stat_rate_trait_RI_dk
-    statplot_trait_RI_dk[ext_index_RI_dr[0],ext_index_RI_dr[1]] = np.nan
+    statplot_trait_RI_dk[ext_index_RI_dk[0],ext_index_RI_dk[1]] = np.nan
     statplot_trait_RI_dk_sorted = np.sort(statplot_trait_RI_dk)
 
     # filter the missing data
@@ -198,7 +198,7 @@ def drawplot(traitdata):
         flier.set(marker='o', color='#fc5a50', alpha=0.5)
 
     # add legends
-    ax1.legend([bh["boxes"][0], ri["boxes"][0]], ['BH', 'RI'], loc='upper left')
+    ax1.legend([bh["boxes"][0], ri["boxes"][0]], ['DR', 'DK'], loc='upper left')
     # add title
     ax1.set_title('Trait distribution')
     # add x label and y label
@@ -231,7 +231,7 @@ def drawplot(traitdata):
     # ax2.spines["left"].set_visible(False)
     # ax2.get_xaxis().set_ticks([])
     # ax2.get_yaxis().set_ticks([])
-    ax2.set_title('BH model')
+    ax2.set_title('DR model')
     # add x label and y label
     ax2.set_xlabel('Count')
     # ax1.set_ylabel('Trait values')
@@ -249,7 +249,7 @@ def drawplot(traitdata):
     # ax3.spines["top"].set_visible(False)
     # ax3.spines["right"].set_visible(False)
     # ax3.spines["left"].set_visible(False)
-    ax3.set_title('RI model')
+    ax3.set_title('DK model')
     # add x label and y label
     ax3.set_xlabel('Count')
     # major_ticks_x3 = np.arange(0, 41, 10)
