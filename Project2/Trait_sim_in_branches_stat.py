@@ -31,7 +31,7 @@ def sigma(a, zi, zj, nj):
 def traitsim(num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
     j = 0   # initialize the iteration number
     delta_trait = 0.1
-    delta_pop = 0.1
+    delta_pop = 0.001
     num_vec = np.arange(1,(num_iteration+1),1) # iteration vector
     nrow = len(num_vec)    # Row number of the trait evolution history matrix
     stat_rate_trait_RI_dr = np.empty((nrow,num_species))   # trait evolution matrix under BH
@@ -62,7 +62,7 @@ def traitsim(num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,
         mu_pop, sigma_pop = mean_pop, dev_pop  # mean and standard deviation
         # population_RI_dr[0] = np.random.normal(mu_pop, sigma_pop, num_species)
         pop_ini = np.empty(num_species)
-        pop_ini.fill(100)
+        pop_ini.fill(10)
         population_RI_dr[0] = pop_ini
         population_RI_dk[0] = population_RI_dr[0]
 
