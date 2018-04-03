@@ -28,7 +28,7 @@ def sigma(a, zi, zj, nj):
     return zi_ret
 
 # Trait simulation function under both Beverton-Holt model and Ricker model for dynamic carrying capacity
-def traitsim(num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
+def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
     j = 0   # initialize the iteration number
     delta_trait = 0.1
     delta_pop = 0.001
@@ -74,9 +74,9 @@ def traitsim(num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,
             K_RI_dr = K
             Beta_RI_dr = beta(a=a, zi=trait_RI_dr[i], zj=trait_RI_dr[i], nj=population_RI_dr[i])
             Sigma_RI_dr = sigma(a=a, zi=trait_RI_dr[i], zj=trait_RI_dr[i], nj=population_RI_dr[i])
-            trait_RI_dr[i + 1] = trait_RI_dr[i] + 2 *gamma1* (theta - trait_RI_dr[i]) * Gamma_RI_dr * (1 -
+            trait_RI_dr[i + 1] = trait_RI_dr[i] + h*( 2 *gamma1* (theta - trait_RI_dr[i]) * Gamma_RI_dr * (1 -
                               Beta_RI_dr / K_RI_dr) + Gamma_RI_dr * Sigma_RI_dr / K_RI_dr \
-                                 + np.random.normal(0, delta_trait, num_species)
+                                 + np.random.normal(0, delta_trait, num_species) )
             population_RI_dr[i + 1] = population_RI_dr[i] * np.exp(Gamma_RI_dr * (1 - Beta_RI_dr / K_RI_dr) \
                                       + np.random.normal(0, delta_pop, num_species))
             population_RI_dr[i + 1, np.where(population_RI_dr[i + 1] < 1)] = 0
@@ -86,9 +86,9 @@ def traitsim(num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,
             K_RI = Kd_vector(gamma_K=gamma_K2, theta=theta, zi=trait_RI_dk[i], K=K)
             Beta_RI = beta(a=a, zi=trait_RI_dk[i], zj=trait_RI_dk[i], nj=population_RI_dk[i])
             Sigma_RI = sigma(a=a, zi=trait_RI_dk[i], zj=trait_RI_dk[i], nj=population_RI_dk[i])
-            trait_RI_dk[i+1] = trait_RI_dk[i] + 2 *r* gamma_K2 * (theta - trait_RI_dk[i]) / K_RI * Beta_RI \
+            trait_RI_dk[i+1] = trait_RI_dk[i] + h*( 2 *r* gamma_K2 * (theta - trait_RI_dk[i]) / K_RI * Beta_RI \
                                  + r * Sigma_RI/ K_RI\
-                              +  np.random.normal(0, delta_trait, num_species)
+                              +  np.random.normal(0, delta_trait, num_species) )
             population_RI_dk[i+1] = population_RI_dk[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI)\
                               +  np.random.normal(0, delta_pop, num_species))
             population_RI_dk[i+1,np.where(population_RI_dk[i+1]<1)] = 0
