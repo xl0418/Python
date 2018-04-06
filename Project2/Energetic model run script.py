@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import os
-from Trait_sim_in_branches_stat import traitsim, drawplot, dotplot
+from Energetic_model_in_branch import traitsim, drawplot, dotplot
 
 # competition rate vector
 a_vec = np.array([0.01,0.05,0.1,0.5])
@@ -14,18 +14,22 @@ r = 1
 theta = 0
 K = 3000
 # gamma_K = 0.01
-num_time = 10000
+num_time = 4000
 num_species = 100
 
 num_species_vec = np.array([2,5,10])
 num_iteration = 100
 count1 = 1
 
-gamma1 = 0.00001
+gamma1 = 0.001
 gamma_K2 = 0.01
 
 a = 0.01
 h=1
+
+p0 = 1
+eta = 0.1
+
 
 # statistics for settings
 for gamma1 in gamma_vec:
@@ -35,7 +39,7 @@ for gamma1 in gamma_vec:
         for num_species in num_species_vec:
             traitdata = traitsim(num_time = num_time, num_species= num_species, num_iteration= num_iteration,
                                  gamma1 = gamma1,  a = a, r= r,K = K, theta = theta, mean_trait= 0, dev_trait=10, mean_pop= 50,
-                                 dev_pop= 10, gamma_K2 = gamma_K2, h = h)
+                                 dev_pop= 10, gamma_K2 = gamma_K2, h = h, eta=eta, p0=p0)
             fig = drawplot(traitdata = traitdata)
             par = (num_species,num_time,num_iteration,count1,count2) #
             # detect the current dir
