@@ -4,15 +4,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(12)
-theta = 0   # optimum of natural selection
+theta =  np.array([-20,0,20])   # optimum of natural selection
 gamma = 0.01 # intensity of natural selection
 r = 1  # growth rate
-a = 0.1 # intensity of competition
-K = 3000  # carrying capacity
+a = 0.05 # intensity of competition
+K = 5000  # carrying capacity
 
 # Function ga: natural selection
 def ga(gamma, theta, zi, r):
-    return r * np.exp(-gamma * (theta - zi) ** 2)
+    zi_ret = np.ndarray((1, len(zi)))
+    for n1 in range(len(zi)):
+        zi_ret[0, n1] =  np.sum(r * np.exp(-gamma * (np.array(theta) - zi[n1]) ** 2)) # np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
+    return zi_ret
+
+def ga_der(gamma, theta, zi, r):
+    zi_ret = np.ndarray((1, len(zi)))
+    for n1 in range(len(zi)):
+        zi_ret[0, n1] =  np.sum(2 * r *gamma * (np.array(theta)-zi[n1]) * np.exp(-gamma * (np.array(theta) - zi[n1]) ** 2)) # np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
+    return zi_ret
 
 # Function beta: competition part
 def beta(a, zi, zj, nj):
@@ -57,7 +66,7 @@ population_RI[0] = population_BH[0]
 print(population_BH[0])
 
 # vectorize function ga
-ga_vector = np.vectorize(ga)
+# ga_vector = np.vectorize(ga)
 Kd_vector = np.vectorize(Kd)
 # Existing species matrix
 existing_species = np.matrix([[1,1,0], [1,1,1],[1,0,1]])
@@ -66,7 +75,8 @@ speciation_event = np.array([1])
 
 for i in range(evo_time):
     delta_pop = 0.01
-
+    # parameter controls the type of competition: 1, competition; -1 cooperation.
+    m = 1
     if(i < speciate_time):
         node = 0
     elif(i < extinction_time and i>= speciate_time):
@@ -75,28 +85,30 @@ for i in range(evo_time):
         node = 2
     # num_species = node + 2
     index_existing_species = np.where(existing_species[node] == 1)[1]
-    K_BH = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_BH[i,index_existing_species], K=K)
-    Gamma_BH = ga_vector(gamma=gamma, theta=theta, zi=trait_BH[i,index_existing_species], r=r)
+    K_BH = K
+    Gamma_BH = ga(gamma=gamma, theta=theta, zi=trait_BH[i,index_existing_species], r=r)
+    Gamma_der_BH = ga_der(gamma=gamma, theta=theta, zi=trait_BH[i,index_existing_species], r=r)
+
     Beta_BH = beta(a=a, zi=trait_BH[i,index_existing_species], zj=trait_BH[i,index_existing_species],
                    nj=population_BH[i,index_existing_species])
     Sigma_BH = sigma(a=a, zi=trait_BH[i,index_existing_species], zj=trait_BH[i,index_existing_species],
                      nj=population_BH[i,index_existing_species])
-    trait_BH[i + 1,index_existing_species] = trait_BH[i,index_existing_species] + 2 * gamma * (theta - trait_BH[i,index_existing_species])\
-                                             * Gamma_BH * ( 1 - np.exp(Gamma_BH) * Beta_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)) \
-                      + (np.exp(Gamma_BH) - 1) * Sigma_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH)+ \
+    trait_BH[i + 1,index_existing_species] = trait_BH[i,index_existing_species] +Gamma_der_BH\
+                                             * ( 1 -  Beta_BH / K_BH) + m * Gamma_BH  * Sigma_BH / K_BH+ \
                                                       np.random.normal(0, delta_trait, len(index_existing_species))
-    population_BH[i + 1,index_existing_species] = population_BH[i,index_existing_species] * np.exp(Gamma_BH) * K_BH / (K_BH + (np.exp(Gamma_BH) - 1) * Beta_BH
+    population_BH[i + 1,index_existing_species] = population_BH[i,index_existing_species] * np.exp(Gamma_BH * (1-Beta_BH/K_BH)
                                       + np.random.normal(0, delta_pop, len(index_existing_species)))
     population_BH[i + 1, np.where(population_BH[i + 1] < 1)] = 0
 
-    Gamma_RI = ga_vector(gamma=gamma, theta=theta, zi=trait_RI[i,index_existing_species], r=r)
-    K_RI = Kd_vector(gamma_K=gamma_K, theta=theta, zi=trait_RI[i,index_existing_species], K=K)
+    Gamma_RI =r
+    Gamma_der_RI = ga_der(gamma=gamma, theta=theta, zi=trait_RI[i,index_existing_species], r=r)
+    K_RI = ga(gamma=gamma, theta=theta, zi=trait_RI[i,index_existing_species], r=r)*K/r
     Beta_RI = beta(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
                    nj=population_RI[i,index_existing_species])
     Sigma_RI = sigma(a=a, zi=trait_RI[i,index_existing_species], zj=trait_RI[i,index_existing_species],
                      nj=population_RI[i,index_existing_species])
-    trait_RI[i+1,index_existing_species] = trait_RI[i,index_existing_species] + 2 * (theta - trait_RI[i,index_existing_species]) \
-                                           * Gamma_RI * (gamma -  (gamma - gamma_K)* Beta_RI/K_RI) + Gamma_RI  * Sigma_RI / K_RI +\
+    trait_RI[i+1,index_existing_species] = trait_RI[i,index_existing_species] +Gamma_der_RI\
+                                           * (Beta_RI/K) + m * Gamma_RI  * Sigma_RI / K_RI +\
                                            np.random.normal(0, delta_trait, len(index_existing_species))
     population_RI[i+1,index_existing_species] = population_RI[i,index_existing_species] * np.exp(Gamma_RI*(1-Beta_RI/K_RI)
                                                  + np.random.normal(0, delta_pop, len(index_existing_species)))
@@ -144,10 +156,18 @@ ax01 = subplot2grid((2, 1), (0, 0))
 ax02 = subplot2grid((2, 1), (1, 0))
 # ax03 = subplot2grid((2, 2), (1, 0), colspan=2, rowspan=1)
 # ax04 = ax03.twinx()
+for i in theta:
+    ax01.axhline(y = i, color='k', linestyle='--',alpha=0.7)
+    ax02.axhline(y = i, color='k', linestyle='--',alpha=0.7)
 
-ax01.set_title('Beverton-Holt')
-ax02.set_title('Ricker')
 
+# line2, = ax01.axhline(y = theta[1], color='k', linestyle='--', label="optimum 2")
+# line3,=ax02.axhline(y = theta[0], color='k', linestyle='--', label="optimum 1")
+# line4, = ax02.axhline(y = theta[1], color='k', linestyle='--', label="optimum 2")
+
+
+ax01.set_title('RI-dr')
+ax02.set_title('RI-dk')
 
 # set y-limits
 ax01.set_ylim(-40,40)
@@ -195,6 +215,9 @@ BH_line3, = ax01.plot([],[], 'g-')
 RI_line1, = ax02.plot([],[], 'b-')
 RI_line2, = ax02.plot([],[], 'r-')
 RI_line3, = ax02.plot([],[], 'g-')
+#
+# hline1, = ax01.axhline(y=theta[0])
+# hline2, = ax01.axhline(y=theta[1])
 
 BH_scatter1 = ax01.scatter([],[], s = 0, c = 'b', alpha = 0.5)
 BH_scatter2 = ax01.scatter([],[], s = 0, c = 'r', alpha = 0.5)

@@ -26,7 +26,7 @@ def sigma(a, zi, zj, nj, p0, eta):
     for n1 in range(len(zi)):
         zi_ret[0, n1] = np.sum(2 * a * (zi[n1]-np.array(zj)) * np.exp( -a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj)\
                                 * p0 /(1+np.exp(-eta * zi[n1])))\
-                              - eta * nj[n1] *  p0 /(1+np.exp(-eta * zi[n1])) * (1-  p0 /(1+np.exp(-eta * zi[n1])))
+                              - eta * nj[n1] *  p0 /(1+np.exp(-eta * zi[n1])) * (1-  1 /(1+np.exp(-eta * zi[n1])))
     return zi_ret
 
 # Trait simulation function under both Beverton-Holt model and Ricker model for dynamic carrying capacity
@@ -64,7 +64,7 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
         mu_pop, sigma_pop = mean_pop, dev_pop  # mean and standard deviation
         # population_RI_dr[0] = np.random.normal(mu_pop, sigma_pop, num_species)
         pop_ini = np.empty(num_species)
-        pop_ini.fill(10)
+        pop_ini.fill(1000)
         population_RI_dr[0] = pop_ini
         population_RI_dk[0] = population_RI_dr[0]
 
@@ -81,7 +81,7 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
                                  + np.random.normal(0, delta_trait, num_species))
             population_RI_dr[i + 1] = population_RI_dr[i] * np.exp(Gamma_RI_dr * (1 - Beta_RI_dr / K_RI_dr)
                                       + np.random.normal(0, delta_pop, num_species))
-            population_RI_dr[i + 1, np.where(population_RI_dr[i + 1] < 0)] = 0
+            population_RI_dr[i + 1, np.where(population_RI_dr[i + 1] < 10)] = 0
 
             #RI dynamic k model --- DK
             Gamma_RI = r
@@ -93,7 +93,7 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
                               +  np.random.normal(0, delta_trait, num_species) )
             population_RI_dk[i+1] = population_RI_dk[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI)\
                               +  np.random.normal(0, delta_pop, num_species))
-            population_RI_dk[i+1,np.where(population_RI_dk[i+1]<0)] = 0
+            population_RI_dk[i+1,np.where(population_RI_dk[i+1]<10)] = 0
 
         # Diversity statistics
         stat_rate_trait_RI_dr[j,:] =trait_RI_dr[num_time,:]
@@ -134,6 +134,8 @@ def drawplot(traitdata):
     # convert the list to an array
     merge_RI_dr = np.concatenate( filtered_data_RI_dr, axis=0 )
     merge_RI_dk = np.concatenate( filtered_data_RI_dk, axis=0 )
+
+
     # create a fig
     fig = plt.figure(1, figsize=(12, 9))
     # determine the limits for axises

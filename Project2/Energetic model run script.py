@@ -12,23 +12,23 @@ gamma_vec = a_vec
 # parameter settings
 r = 1
 theta = 0
-K = 3000
+K = 3000000
 # gamma_K = 0.01
-num_time = 4000
-num_species = 100
+num_time = 10000
+num_species = 1
 
-num_species_vec = np.array([2,5,10])
+num_species_vec = np.array([15,20,30,40])
 num_iteration = 100
 count1 = 1
 
-gamma1 = 0.001
-gamma_K2 = 0.01
+gamma1 = 0.0001
+gamma_K2 = 0.0001
 
 a = 0.01
 h=1
 
 p0 = 1
-eta = 0.1
+eta = 0.01
 
 
 # statistics for settings
@@ -46,7 +46,7 @@ for gamma1 in gamma_vec:
             script_dir = os.path.dirname('__file__')
             results_dir = os.path.join(script_dir, 'resultes/')
             # file names
-            name = "species%d-time%d-sim%d-nat%d-com%d-DRvsDK" % par
+            name = "species%d-time%d-sim%d-nat%d-com%d-DRvsDK+E" % par
             file_name = "%s.pdf" % name
             # if dir doesn't exist, create it
             if not os.path.isdir(results_dir):
@@ -56,7 +56,7 @@ for gamma1 in gamma_vec:
             # close the windows showing figs
             plt.close(fig)
 
-            name = "species%d-time%d-sim%d-nat%d-com%d-DRvsDK-TV" % par
+            name = "species%d-time%d-sim%d-nat%d-com%d-DRvsDK+E-TV" % par
             file_name = "%s.pdf" % name
             dotfig = dotplot(traitdata=traitdata)
             plt.savefig(results_dir + file_name)
