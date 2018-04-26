@@ -4,10 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(12)
-theta =  np.array([-50,-40,-30,-20,-10,0,10,20,30,40,50])   # optimum of natural selection
+theta =  np.array([-60,-30,0,30,60])   # optimum of natural selection
 gamma = 0.01 # intensity of natural selection
 r = 1  # growth rate
-a = 0.05 # intensity of competition
+a = 0.1 # intensity of competition
 K = 5000  # carrying capacity
 # parameter controls the type of competition: 1, competition; -1 cooperation.
 m = 1
@@ -16,8 +16,8 @@ m = 1
 speciate_time = 1000
 extinction_time = 2000
 evo_time = 3000
-total_species = 30
-gamma_K = 0.01
+total_species = 10
+gamma_K = 0.1
 
 
 # Function ga: natural selection
