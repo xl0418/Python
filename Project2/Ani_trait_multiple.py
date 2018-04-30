@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 np.random.seed(12)
 theta =  np.array([-60,-30,0,30,60])   # optimum of natural selection
-gamma = 0.01 # intensity of natural selection
+gamma = 0.1# intensity of natural selection
 r = 1  # growth rate
 a = 0.1 # intensity of competition
 K = 5000  # carrying capacity
@@ -16,8 +16,8 @@ m = 1
 speciate_time = 1000
 extinction_time = 2000
 evo_time = 3000
-total_species = 10
-gamma_K = 0.1
+total_species = 15
+# gamma_K = gamma
 
 
 # Function ga: natural selection
@@ -50,14 +50,14 @@ def sigma(a, zi, zj, nj):
 def Kd(gamma_K, theta, zi, K):
     zi_ret = np.ndarray((1, len(zi)))
     for n1 in range(len(zi)):
-        zi_ret[0, n1] = np.sum(K * np.exp(-gamma_K * (
-                    np.array(theta) - zi[n1]) ** 2))  # np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
+        zi_ret[0, n1] = max(np.sum(K * np.exp(-gamma_K * (
+                    np.array(theta) - zi[n1]) ** 2)),1)  # np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
     return zi_ret
 #Derivative of Kd
 def Kd_der(gamma_K, theta, zi, K):
     zi_ret = np.ndarray((1, len(zi)))
     for n1 in range(len(zi)):
-        zi_ret[0, n1] =  np.sum(2 * K *gamma_K * (np.array(theta)-zi[n1]) * np.exp(-gamma * (np.array(theta) - zi[n1]) ** 2)) # np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
+        zi_ret[0, n1] =  np.sum(2 * K *gamma_K * (np.array(theta)-zi[n1]) * np.exp(-gamma_K * (np.array(theta) - zi[n1]) ** 2)) # np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
     return zi_ret
 
 
@@ -75,7 +75,7 @@ trait_RI = np.zeros((evo_time + 1, total_species))
 population_RI = np.zeros((evo_time + 1, total_species))
 
 #  initialize condition for species trait and population
-mu_trait, sigma_trait = 0, 10  # mean and standard deviation
+mu_trait, sigma_trait = 0, 20  # mean and standard deviation
 trait_BH[0] = existing_species[0] * np.random.normal(mu_trait, sigma_trait, total_species)
 trait_RI[0] = trait_BH[0]
 print(trait_BH[0])
@@ -209,11 +209,11 @@ popu_BH_spec_texts= []
 popu_RI_spec_texts= []
 
 text_y1 = np.linspace(0.9, 0.9 - (total_species - 1) * 0.05, total_species)
-text_y2 = np.linspace(0.5, 0.5 - (total_species - 1) * 0.05, total_species)
+text_y2 = np.linspace(0.9, 0.9 - (total_species - 1) * 0.05, total_species)
 
 for i in np.arange(total_species):
-    popu_BH_spec_text1 = ax01.text(0.8,text_y1[i], '', transform = ax01.transAxes)
-    popu_RI_spec_text1 = ax02.text(0.8,text_y2[i],'', transform = ax02.transAxes)
+    popu_BH_spec_text1 = ax01.text(1,text_y1[i], '', transform = ax01.transAxes)
+    popu_RI_spec_text1 = ax02.text(1,text_y2[i],'', transform = ax02.transAxes)
     popu_BH_spec_texts.append(popu_BH_spec_text1)
     popu_RI_spec_texts.append(popu_RI_spec_text1)
 
@@ -252,8 +252,8 @@ def animate(i):
         RI_scatters[j].set_sizes([RI_sizes[j][i]])
 
     # Animating labels
-        popu_BH_spec_texts[j].set_text('Pop of Spec %d = %.1f' % (j+1, population_BH[i,j]))
-        popu_RI_spec_texts[j].set_text('Pop of Spec %d = %.1f' % (j+1, population_RI[i,j]))
+        popu_BH_spec_texts[j].set_text('POS %d = %.1f' % (j+1, population_BH[i,j]))
+        popu_RI_spec_texts[j].set_text('POS %d = %.1f' % (j+1, population_RI[i,j]))
 
         if (i < 1000):
             BH_lines[2].set_data([], [])
