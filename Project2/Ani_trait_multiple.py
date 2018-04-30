@@ -4,8 +4,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 np.random.seed(12)
-theta =  np.array([-60,-30,0,30,60])   # optimum of natural selection
-gamma = 0.1# intensity of natural selection
+theta =   np.array([-60,-30,0,30,60])   # optimum of natural selection
+gamma = 0.01# intensity of natural selection
 r = 1  # growth rate
 a = 0.1 # intensity of competition
 K = 5000  # carrying capacity
@@ -79,10 +79,12 @@ mu_trait, sigma_trait = 0, 20  # mean and standard deviation
 trait_BH[0] = existing_species[0] * np.random.normal(mu_trait, sigma_trait, total_species)
 trait_RI[0] = trait_BH[0]
 print(trait_BH[0])
+print(trait_RI[0])
+
 mu_pop, sigma_pop = 50, 10  # mean and standard deviation
 population_BH[0] =existing_species[0] * np.random.normal(mu_pop, sigma_pop, total_species)
 population_RI[0] = population_BH[0]
-print(population_BH[0])
+# print(population_BH[0])
 
 
 speciation_event = np.array([1])
@@ -144,8 +146,17 @@ for i in range(evo_time):
         trait_RI[i + 1, 1] = None
         population_RI[i + 1, 1] = 0
 
+ext_times_RI = []
+ext_times_BH = []
+ext_spec_index_RI = np.where(population_RI[evo_time,] == 0)[0]
+ext_spec_index_BH = np.where(population_BH[evo_time,] == 0)[0]
 
-
+for j in ext_spec_index_RI:
+    ext_time = np.where(population_RI[:,j] == 0)
+    ext_times_RI.append(ext_time[0][0])
+for j in ext_spec_index_BH:
+    ext_time = np.where(population_BH[:,j] == 0)
+    ext_times_BH.append(ext_time[0][0])
 
 x = np.array(range(evo_time))
 BH_traits = []
@@ -243,18 +254,26 @@ def animate(i):
         BH_datas.append(BH_data)
         RI_datas.append(RI_data)
 
-    for j in np.arange(total_species):
+    # for j in np.arange(total_species):
         BH_lines[j].set_data(x[0:i], BH_traits[j][0:i])
         RI_lines[j].set_data(x[0:i], RI_traits[j][0:i])
         BH_scatters[j].set_offsets(BH_datas[j])
         RI_scatters[j].set_offsets(RI_datas[j])
         BH_scatters[j].set_sizes([BH_sizes[j][i]])
         RI_scatters[j].set_sizes([RI_sizes[j][i]])
+        # BH_lines[j].set_label("spec %d" % j)
+        # Extinct species being labeled by dashed lines
+        # if (population_BH[i, j] == 0):
+        #     BH_lines[j].set_dashes([2, 2, 2, 2])
+        #     BH_lines[j].set_color("red")
+        # if (population_RI[i, j] == 0):
+        #     RI_lines[j].set_dashes([2, 2, 2, 2])
+        #     RI_lines[j].set_color("red")
 
-    # Animating labels
+        # Animating labels
         popu_BH_spec_texts[j].set_text('POS %d = %.1f' % (j+1, population_BH[i,j]))
         popu_RI_spec_texts[j].set_text('POS %d = %.1f' % (j+1, population_RI[i,j]))
-
+        # if (1 not in ext_spec_index_BH):
         if (i < 1000):
             BH_lines[2].set_data([], [])
             RI_lines[2].set_data([], [])
@@ -272,11 +291,26 @@ def animate(i):
             RI_lines[1].set_data(x[0:2000], RI_traits[1][0:2000])
 
 
+        if (j in ext_spec_index_BH ):
+            end_time_BH = ext_times_BH[np.where(j == ext_spec_index_BH)[0][0]]
+            if (i>= end_time_BH):
+                BH_lines[j].set_data(x[0:end_time_BH], BH_traits[j][0:end_time_BH])
+
+        if (j in ext_spec_index_RI):
+            end_time_RI = ext_times_RI[np.where(j == ext_spec_index_RI)[0][0]]
+            if (i>= end_time_RI):
+                RI_lines[j].set_data(x[0:end_time_RI], RI_traits[j][0:end_time_RI])
+
+    BH_lines[1].set_color("green")
+    BH_lines[2].set_color("green")
+    RI_lines[1].set_color("green")
+    RI_lines[2].set_color("green")
+
     return BH_lines, RI_lines,BH_scatters,RI_scatters
 
 ##
 time_template = 'Time = %d G'    # prints running simulation time
-time_text = ax01.text(0.05, 0.9, '', transform=ax01.transAxes)
+time_text = ax01.text(0.05, 1, '', transform=ax01.transAxes)
 #
 ani = animation.FuncAnimation(f0, animate, interval= 1, frames= 3000, repeat=False, blit=False) #, init_func=init)
 plt.show()
