@@ -28,7 +28,7 @@ def sigma(a, zi, zj, nj):
     return zi_ret
 
 # Trait simulation function under both Beverton-Holt model and Ricker model for dynamic carrying capacity
-def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop):
+def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, theta,K , mean_trait, dev_trait, mean_pop, dev_pop,replicate):
     j = 0   # initialize the iteration number
     delta_trait = 0.1
     delta_pop = 0.001
@@ -45,8 +45,9 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
 
     # loop for preset iteration
     for loop in num_vec:
-        np.random.seed(loop)  # set random seed from 1 to max of iteration
-        print(j)
+        if replicate == 1:
+            np.random.seed(loop)  # set random seed from 1 to max of iteration
+        # print(j)
         # Matrices for trait and populations under BH and RI
         trait_RI_dr = np.zeros((num_time+1, num_species))
         population_RI_dr = np.zeros((num_time+1, num_species))
