@@ -46,8 +46,8 @@ def MCMC_ABC(startvalue, iterations,delta,obs,sort):
     MCMCchain[0,] = startvalue
     par_jump = np.empty(2)
     for i in range(iterations):
-        par_jump[0] = abs(np.random.normal(loc=MCMCchain[i,0], scale= 1 ))
-        par_jump[1] = abs(np.random.normal(loc=MCMCchain[i,1], scale= 1 ))
+        par_jump[0] = abs(np.random.normal(loc=MCMCchain[i,0], scale= 0.01 ))
+        par_jump[1] = abs(np.random.normal(loc=MCMCchain[i,1], scale= 0.01 ))
         if (ABC_acceptance(par_jump,delta = delta, obs = obs,sort = sort)):
             MCMCchain[i+1,] = par_jump
             print("MCMC chain: %d Accepted" % (i+1))
