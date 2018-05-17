@@ -2,6 +2,7 @@ import matplotlib.animation as animation
 from matplotlib.pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
+from JSAnimation import IPython_display
 
 np.random.seed(12)
 theta =   np.array([-60,-30,0,30,60])   # optimum of natural selection

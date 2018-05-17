@@ -3,10 +3,10 @@ from IPython.core.pylabtools import figsize
 import matplotlib.pyplot as plt
 from Trait_sim_in_branches_stat import traitsim, drawplot, dotplot
 from ABC_MCMC import single_trait_sim,calibrication,ABC_acceptance,MCMC_ABC
-
+import pylab as P
 import matplotlib.mlab as mlab
 from sklearn.neighbors import KernelDensity
-
+import pymc3 as pm
 # Observation parameters [gamma,a]
 par_obs = np.array([0.1,0.1])
 # Observation generated
@@ -21,6 +21,13 @@ collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs
 np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt")
 
+# distance distribution
+P.figure()
+dis_data = collection[:,[2,3]]
+n, bins, patches = P.hist(dis_data, 15, normed=1, histtype='bar',
+                            color=['crimson', 'burlywood'],
+                            label=['distance', 'sorted distance'])
+P.legend()
 
 # Estimate prior distribution of parameters
 # Generate random samples from a mixture of 2 Gaussians
@@ -60,14 +67,22 @@ iterations = 20000
 
 posterior = MCMC_ABC(startvalue= startvalue_par, iterations = iterations, delta = delta, obs = obs,sort = 1)
 np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/posterior.txt",posterior)
-# posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/posterior.txt")
+# posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result/posterior.txt")
+pm.autocorrplot(posterior)
 
 
+import pymc3 as pm
+with pm.Model() as model:
+    x = pm.Normal('x', shape=1)
+    tr = pm.sample(10000, step=pm.Metropolis())[5000::5]
+
+pm.autocorrplot(tr)
 # Statistic
 
 # Distribution plots for parameters
 gamma_samples = posterior[:,0]
 a_samples = posterior[:, 1]
+figdis = plt.figure()
 figsize(16, 10)
 
 plt.subplot(211)
@@ -85,8 +100,10 @@ plt.hist(a_samples, histtype='stepfilled',
 plt.ylabel('Probability Density')
 plt.show()
 
+figdis.savefig('c:/Liang/Googlebox/Research/Project2/python_p2/posterior.png', dpi=figdis.dpi)
 
 # Trace plots
+figtra = plt.figure()
 figsize(12, 6)
 
 # Plot alpha trace
@@ -102,3 +119,5 @@ plt.plot(a_samples, color='b')
 plt.xlabel('Samples'); plt.ylabel('Parameter')
 plt.tight_layout(h_pad=0.8)
 plt.show()
+figtra.savefig('c:/Liang/Googlebox/Research/Project2/python_p2/posterior_trace.png', dpi=figtra.dpi)
+
