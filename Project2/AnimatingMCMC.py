@@ -12,6 +12,7 @@ true_a = 0.1
 true_mean = [true_gamma,true_a]
 posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result10w/posterior.txt")
 N, D = posterior.shape
+posterior = posterior[0:N:100,:]
 
 q75_1, q25_1 = np.percentile(posterior[:,0], [75 ,25])
 iqr_1 = q75_1 - q25_1
@@ -21,7 +22,7 @@ iqr_2 = q75_2 - q25_2
 
 true_iqr = [iqr_1,iqr_2]
 # Quickly hacked plotting code
-samples = 100000
+samples = len(posterior[:,0])
 fig = plt.figure(figsize=(10, 10))
 i_width = (true_gamma-.1, true_gamma+1)
 s_width = (true_a-.1, true_a+1)
@@ -50,13 +51,13 @@ ax4.set_xlabel('$\gamma$')
 ax4.set_ylabel('autocorr')
 ax4.set_xticks([])
 ax4.set_yticks([])
-ax4.axis([-10, 10, -.3, 1])
+ax4.axis([-15, 15, -.3, 1])
 
 # ax5.acorr(posterior[int(240 / 2.):240:10, 1], detrend=plt.mlab.detrend_mean)
 ax5.set_xlabel('a')
 ax5.set_xticks([])
 ax5.set_yticks([])
-ax5.axis([-10, 10, -.3, 1])
+ax5.axis([-15, 15, -.3, 1])
 
 fig.subplots_adjust(wspace=0.0, hspace=0.0)
 
@@ -72,8 +73,8 @@ def animate(i):
     ax3.set_ylabel(ylabel='a')
 
     ax3.plot([0.1],[0.1], 'r+')
-    ax1.plot(posterior[:,0][i:0:-1], range(len(posterior[:i,0])), 'r', lw=1)
-    ax2.plot(range(len(posterior[:i,1])), posterior[:,1][i:0:-1], 'r', lw=1)
+    ax1.plot(posterior[i::-1,0], range(len(posterior[i::-1,0])), 'r', lw=1)
+    ax2.plot(range(len(posterior[i::-1,1])), posterior[i::-1,1], 'r', lw=1)
     ax3.plot(posterior[0:i,0], posterior[0:i,1], 'o', lw=2, alpha=.1)
     ax3.plot(posterior[0:i,0], posterior[0:i,1], 'r', lw=1, alpha=.5)
 
@@ -93,26 +94,27 @@ def animate(i):
         ax4.set_ylabel('autocorr')
         ax4.set_xticks([])
         ax4.set_yticks([])
-        ax4.axis([-10, 10, -.3, 1])
+        ax4.axis([-15, 15, -.3, 1])
 
         ax5.set_xlabel('a')
         ax5.set_xticks([])
         ax5.set_yticks([])
-        ax5.axis([-10, 10, -.3, 1])
+        ax5.axis([-15, 15, -.3, 1])
         ax4.acorr(posterior[int(i / 2.):i:10, 0], detrend=plt.mlab.detrend_mean)
         ax5.acorr(posterior[int(i / 2.):i:10, 1], detrend=plt.mlab.detrend_mean)
 
     ## textual information
 
     # text.set_text('')
-    str = ''
-    str += 't = %d\n' % i
-    str += 'acceptance rate = %.2f\n\n' % (1. - np.mean(np.diff(posterior[int(i / 2.):i, 0]) == 0.))
-    str += 'mean(X) = %s' % pretty_array(posterior[int(i / 2.):i, :].mean(0))
-    str += ' / true mean = %s\n' % pretty_array(true_mean)
-    # text.set_text(str)
 
+    # text.set_text(str)
+    str = ''
     if i > 10:
+
+        str += 't = %d\n' % i
+        str += 'acceptance rate = %.2f\n\n' % (1. - np.mean(np.diff(posterior[int(i / 2.):i, 0]) == 0.))
+        str += 'mean(X) = %s' % pretty_array(posterior[int(i / 2.):i, :].mean(0))
+        str += ' / true mean = %s\n' % pretty_array(true_mean)
         # iqr = plt.sort(posterior[int(i / 2.):i, :], axis=0)[int(.25 * (i / 2.), .75 * (i / 2.)), :].T
         q75_1_i, q25_1_i = np.percentile(posterior[int(i / 2.):i, 0], [75, 25])
         # iqr_1_i = q75_1_i - q25_1_i
@@ -130,4 +132,4 @@ def animate(i):
     plt.draw()
 
 
-animation.FuncAnimation(fig, animate, frames=samples, interval=1)#, blit=True)
+animation.FuncAnimation(fig, animate, frames=(samples-1), interval=1,repeat = False)#, blit=True)
