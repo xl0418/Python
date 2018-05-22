@@ -63,7 +63,7 @@ mn,idx = min( (collection[i,3],i) for i in range(len(collection[:,3])) )
 startvalue_par = collection[idx,:2]
 
 # ABC_MCMC step
-iterations = 20000
+iterations = 100000
 
 posterior = MCMC_ABC(startvalue= startvalue_par, iterations = iterations, delta = delta, obs = obs,sort = 1)
 np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/posterior.txt",posterior)
