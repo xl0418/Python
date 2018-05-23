@@ -10,9 +10,9 @@ def pretty_array(x):
 true_gamma = 0.1
 true_a = 0.1
 true_mean = [true_gamma,true_a]
-posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result10w/posterior.txt")
-N, D = posterior.shape
-posterior = posterior[0:N:100,:]
+posterior_whole = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result10w/posterior.txt")
+N, D = posterior_whole.shape
+posterior = posterior_whole[0:N:100,:]
 
 q75_1, q25_1 = np.percentile(posterior[:,0], [75 ,25])
 iqr_1 = q75_1 - q25_1
@@ -112,7 +112,8 @@ def animate(i):
     if i > 10:
 
         str += 't = %d\n' % i
-        str += 'acceptance rate = %.2f\n\n' % (1. - np.mean(np.diff(posterior[int(i / 2.):i, 0]) == 0.))
+        str += 'acceptance rate = %.2f' % (1. - np.mean(np.diff(posterior[int(i / 2.):i, 0]) == 0.))
+        str += ' / whole acceptance rate = %.2f\n' % (1. - np.mean(np.diff(posterior_whole[int(i / 2.):i, 0]) == 0.))
         str += 'mean(X) = %s' % pretty_array(posterior[int(i / 2.):i, :].mean(0))
         str += ' / true mean = %s\n' % pretty_array(true_mean)
         # iqr = plt.sort(posterior[int(i / 2.):i, :], axis=0)[int(.25 * (i / 2.), .75 * (i / 2.)), :].T
@@ -132,4 +133,8 @@ def animate(i):
     plt.draw()
 
 
-animation.FuncAnimation(fig, animate, frames=(samples-1), interval=1,repeat = False)#, blit=True)
+ani = animation.FuncAnimation(fig, animate, frames=(samples-1), interval=1,repeat = False)#, blit=True)
+Writer = animation.writers['ffmpeg']
+writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+ani.save('c:/Liang/Googlebox/Research/Project2/MCMC10w.mp4', writer=writer)
+# ani.save('/Users/dudupig/Google 云端硬盘/Python/Project2/S+C.mp4', writer=writer)

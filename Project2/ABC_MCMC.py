@@ -1,16 +1,27 @@
 import numpy as np
 from Trait_sim_in_branches_stat import traitsim, drawplot, dotplot
-
+import scipy.stats
 
 def single_trait_sim(par):
     sim = traitsim(h = 1, num_iteration=1,num_species=10,gamma1=par[0],gamma_K2=par[0],a = par[1],r = 1,theta = 0,K = 5000
                    , mean_trait=0,dev_trait=20,mean_pop=50,dev_pop=20, num_time=2000,replicate = 0)
     return sim
 
-def calibrication(samplesize, priorpar, obs):
+def PosNormal(mean, sigma):
+    x = np.random.normal(mean,sigma,1)
+    return(x if x>=0 else PosNormal(mean,sigma))
+
+def calibrication(samplesize, priorpar, obs, mode = 'uni'):
     collection = np.zeros(shape=(samplesize,4))
-    uniform_gamma = np.random.uniform(priorpar[0],priorpar[1],samplesize)
-    uniform_a = np.random.uniform(priorpar[2],priorpar[3],samplesize)
+    if mode == 'uni':
+        uniform_gamma = np.random.uniform(priorpar[0],priorpar[1],samplesize)
+        uniform_a = np.random.uniform(priorpar[2],priorpar[3],samplesize)
+    elif mode == 'nor':
+        uniform_gamma = np.zeros(samplesize)
+        uniform_a = np.zeros(samplesize)
+        for i in range(samplesize):
+            uniform_gamma[i] = PosNormal(priorpar[0],priorpar[1])
+            uniform_a[i] = PosNormal(priorpar[2],priorpar[3])
 
     for i in range(samplesize):
         print(i)
@@ -41,19 +52,41 @@ def ABC_acceptance(par,delta,obs,sort):
         else:
             return False
 
-def MCMC_ABC(startvalue, iterations,delta,obs,sort):
-    MCMCchain = np.zeros(shape=(iterations+1,2))
-    MCMCchain[0,] = startvalue
+def MCMC_ABC(startvalue, iterations,delta,obs,sort,priorpar,mode = 'uni'):
+    MCMC = np.zeros(shape=(iterations+1,2))
+    MCMC[0,] = startvalue
     par_jump = np.empty(2)
-    for i in range(iterations):
-        par_jump[0] = abs(np.random.normal(loc=MCMCchain[i,0], scale= 0.01 ))
-        par_jump[1] = abs(np.random.normal(loc=MCMCchain[i,1], scale= 0.01 ))
-        if (ABC_acceptance(par_jump,delta = delta, obs = obs,sort = sort)):
-            MCMCchain[i+1,] = par_jump
-            print("MCMC chain: %d Accepted" % (i+1))
-        else:
-            MCMCchain[i + 1,] = MCMCchain[i ,]
-            print("MCMC chain: %d Rejected" % (i+1))
+    if mode == 'uni':
+        for i in range(iterations):
+            par_jump[0] = abs(np.random.normal(loc=MCMC[i,0], scale= 0.01 ))
+            par_jump[1] = abs(np.random.normal(loc=MCMC[i,1], scale= 0.01 ))
 
-    return MCMCchain
+            if (ABC_acceptance(par_jump,delta = delta, obs = obs,sort = sort)):
+                MCMC[i+1,] = par_jump
+                print("MCMC : %d Accepted" % (i+1))
+
+            else:
+                MCMC[i + 1,] = MCMC[i ,]
+                print("MCMC : %d Rejected" % (i+1))
+    elif mode == 'nor':
+        for i in range(iterations):
+            par_jump[0] = abs(np.random.normal(loc=MCMC[i, 0], scale=0.01))
+            par_jump[1] = abs(np.random.normal(loc=MCMC[i, 1], scale=0.01))
+
+            pro = np.random.uniform(0,1,1)[0]
+            pro_gamma1 = scipy.stats.norm(priorpar[0], priorpar[1]).pdf(par_jump[0])
+            pro_gamma2 = scipy.stats.norm(priorpar[0], priorpar[1]).pdf(MCMC[i ,0])
+            pro_a1 = scipy.stats.norm(priorpar[0], priorpar[1]).pdf(par_jump[1])
+            pro_a2 = scipy.stats.norm(priorpar[0], priorpar[1]).pdf(MCMC[i ,1])
+
+            pro_ratio = (pro_gamma1*pro_a1)/(pro_gamma2*pro_a2)
+            accept_creterion = np.min([1,pro_ratio])
+            if ABC_acceptance(par = par_jump, delta=delta, obs=obs, sort=sort) and (pro <= accept_creterion):
+                MCMC[i + 1,] = par_jump
+                print("MCMC : %d Accepted" % (i + 1))
+            else:
+                MCMC[i + 1,] = MCMC[i,]
+                print("MCMC : %d Rejected" % (i + 1))
+
+    return MCMC
 
