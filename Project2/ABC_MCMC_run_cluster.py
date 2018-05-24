@@ -13,7 +13,7 @@ obs = traitsim(h = 1, num_iteration=1,num_species=10,gamma1=par_obs[0],gamma_K2=
 # Calibriation step
 cal_size = 20000
 priorpar = [0.2,0.5,0.1,0.4]
-collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs)
+collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs, mode='nor')
 np.savetxt("/home/p274981/Python_p2/calibration2w.txt",collection)
 # collection = np.loadtxt("/home/p274981/Python_p2/testcal.txt")
 

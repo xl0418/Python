@@ -16,23 +16,35 @@ def calibrication(samplesize, priorpar, obs, mode = 'uni'):
     if mode == 'uni':
         uniform_gamma = np.random.uniform(priorpar[0],priorpar[1],samplesize)
         uniform_a = np.random.uniform(priorpar[2],priorpar[3],samplesize)
+        do = True
     elif mode == 'nor':
         uniform_gamma = np.zeros(samplesize)
         uniform_a = np.zeros(samplesize)
         for i in range(samplesize):
             uniform_gamma[i] = PosNormal(priorpar[0],priorpar[1])
             uniform_a[i] = PosNormal(priorpar[2],priorpar[3])
+        do = True
+    elif mode == 'self':
+        uniform_gamma = np.repeat(priorpar[0],samplesize)
+        uniform_a = np.repeat(priorpar[1],samplesize)
+        do = True
+    else:
+        print('Please indicate one mode!')
+        uniform_a = 0
+        uniform_gamma = 0
+        do = False
 
-    for i in range(samplesize):
-        print(i)
-        par_cal = np.zeros(2)
-        par_cal[0] = uniform_gamma[i]
-        par_cal[1] = uniform_a[i]
-        sample_cal =  single_trait_sim(par_cal)
-        diff =  np.linalg.norm(sample_cal[0]-obs[0])
-        diff_sort = np.linalg.norm(np.sort(sample_cal[0])-np.sort(obs[0]))
-        collection[i] = np.concatenate((par_cal,[diff],[diff_sort]))
-    return collection
+    if do == True:
+        for i in range(samplesize):
+            print(i)
+            par_cal = np.zeros(2)
+            par_cal[0] = uniform_gamma[i]
+            par_cal[1] = uniform_a[i]
+            sample_cal =  single_trait_sim(par_cal)
+            diff =  np.linalg.norm(sample_cal[0]-obs[0])
+            diff_sort = np.linalg.norm(np.sort(sample_cal[0])-np.sort(obs[0]))
+            collection[i] = np.concatenate((par_cal,[diff],[diff_sort]))
+        return collection
 
 
 

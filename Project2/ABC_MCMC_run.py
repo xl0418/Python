@@ -1,7 +1,7 @@
 import numpy as np
 from IPython.core.pylabtools import figsize
 import matplotlib.pyplot as plt
-from Trait_sim_in_branches_stat import traitsim, drawplot, dotplot
+from Trait_sim_in_branches_stat import traitsim
 from ABC_MCMC import calibrication,MCMC_ABC
 import pylab as P
 import matplotlib.mlab as mlab
@@ -19,13 +19,14 @@ cal_size = 100
 # Uniform prior distribution example
 priorpar = [0.0001,1,0.0001,1]
 collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs)
-np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
+# np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt")
 # Normal prior distribution example
 priorpar = [0.1,0.2,0.1,0.3]
 collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs, mode = 'nor')
-np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
+# np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt")
+# collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/priorresult/calibration2w.txt")
 
 
 
@@ -37,14 +38,15 @@ n, bins, patches = P.hist(dis_data, 15, normed=1, histtype='bar',
                             color=['crimson', 'burlywood'],
                             label=['distance', 'sorted distance'])
 P.legend()
+# plt.show()
 # Estimate prior distribution of parameters
 # Generate random samples from a mixture of 2 Gaussians
 # with modes at 5 and 10
-data = np.concatenate((5 + np.random.randn(10, 1),
-                       10 + np.random.randn(30, 1)))
+data = np.array(collection[:,0])
+data = data.reshape(-1,1)
 # Plot the true distribution
-x = np.linspace(0, 16, 1000)[:, np.newaxis]
-norm_vals = mlab.normpdf(x, 5, 1) * 0.25 + mlab.normpdf(x, 10, 1) * 0.75
+x = np.linspace(0, 1, 100)[:, np.newaxis]
+norm_vals = mlab.normpdf(x, 0.1, 0.2)
 plt.plot(x, norm_vals)
 # Plot the data using a normalized histogram
 plt.hist(data, 50, normed=True)
@@ -52,7 +54,7 @@ plt.hist(data, 50, normed=True)
 kd = KernelDensity(kernel='gaussian', bandwidth=0.75).fit(data)
 # Plot the estimated densty
 kd_vals = np.exp(kd.score_samples(x))
-plt.plot(x, kd_vals)
+plt.plot(x, kd_vals,'--r')
 # Show the plots
 plt.show()
 
@@ -71,7 +73,7 @@ iterations = 100
 posterior = MCMC_ABC(startvalue= startvalue_par, iterations = iterations, delta = delta, obs = obs,sort = 1,
                      priorpar=priorpar, mode = 'nor')
 np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/posterior.txt",posterior)
-# posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result/posterior.txt")
+# posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result10w/posterior.txt")
 pm.autocorrplot(posterior)
 
 
@@ -125,3 +127,10 @@ plt.tight_layout(h_pad=0.8)
 plt.show()
 figtra.savefig('c:/Liang/Googlebox/Research/Project2/python_p2/posterior_trace.png', dpi=figtra.dpi)
 
+
+# self study
+cal_size = 10000
+# Uniform prior distribution example
+priorpar = [0.1,0.1]
+collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs,mode='self')
+np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/selfcal.txt",collection)

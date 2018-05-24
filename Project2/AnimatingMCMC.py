@@ -75,8 +75,8 @@ def animate(i):
     ax3.plot([0.1],[0.1], 'r+')
     ax1.plot(posterior[i::-1,0], range(len(posterior[i::-1,0])), 'r', lw=1)
     ax2.plot(range(len(posterior[i::-1,1])), posterior[i::-1,1], 'r', lw=1)
-    ax3.plot(posterior[0:i,0], posterior[0:i,1], 'o', lw=2, alpha=.1)
-    ax3.plot(posterior[0:i,0], posterior[0:i,1], 'r', lw=1, alpha=.5)
+    ax3.plot(posterior[0:i,0], posterior[0:i,1], 'o', lw=2, alpha=.2)
+    ax3.plot(posterior[0:i,0], posterior[0:i,1], 'r', lw=1, alpha=.7)
 
     intercept = posterior[i, 0]
     x = posterior[i, 1]
@@ -134,7 +134,8 @@ def animate(i):
 
 
 ani = animation.FuncAnimation(fig, animate, frames=(samples-1), interval=1,repeat = False)#, blit=True)
-Writer = animation.writers['ffmpeg']
-writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-ani.save('c:/Liang/Googlebox/Research/Project2/MCMC10w.mp4', writer=writer)
+plt.show()
+# Writer = animation.writers['ffmpeg']
+# writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
+# ani.save('c:/Liang/Googlebox/Research/Project2/MCMC10w.mp4', writer=writer)
 # ani.save('/Users/dudupig/Google 云端硬盘/Python/Project2/S+C.mp4', writer=writer)
