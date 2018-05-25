@@ -10,9 +10,9 @@ def pretty_array(x):
 true_gamma = 0.1
 true_a = 0.1
 true_mean = [true_gamma,true_a]
-posterior_whole = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/001result10w/posterior.txt")
+posterior_whole = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/Normaldistributionresult/posterior_nor.txt")
 N, D = posterior_whole.shape
-posterior = posterior_whole[0:N:100,:]
+posterior = posterior_whole[0:N:20,:]
 
 q75_1, q25_1 = np.percentile(posterior[:,0], [75 ,25])
 iqr_1 = q75_1 - q25_1
@@ -24,8 +24,8 @@ true_iqr = [iqr_1,iqr_2]
 # Quickly hacked plotting code
 samples = len(posterior[:,0])
 fig = plt.figure(figsize=(10, 10))
-i_width = (true_gamma-.1, true_gamma+1)
-s_width = (true_a-.1, true_a+1)
+i_width = (true_gamma-.1, true_gamma+0.4)
+s_width = (true_a-.1, true_a+0.4)
 samples_width = (0, samples/10)
 ax1 = fig.add_subplot(221, xlim=i_width, ylim=samples_width)
 ax2 = fig.add_subplot(224, xlim=samples_width, ylim=s_width)
@@ -65,10 +65,10 @@ def animate(i):
     ax1.clear()
     ax2.clear()
     ax3.clear()
-    ax3.set_xlim(0,1.1)
-    ax3.set_ylim(0,1.1)
-    ax1.set_xlim(0,1.1)
-    ax2.set_ylim(0,1.1)
+    ax3.set_xlim(i_width[0],i_width[1])
+    ax3.set_ylim(s_width[0],s_width[1])
+    ax1.set_xlim(i_width[0],i_width[1])
+    ax2.set_ylim(s_width[0],s_width[1])
     ax3.set_xlabel('$\gamma$')
     ax3.set_ylabel(ylabel='a')
 
@@ -114,7 +114,7 @@ def animate(i):
         str += 't = %d\n' % i
         str += 'acceptance rate = %.2f' % (1. - np.mean(np.diff(posterior[int(i / 2.):i, 0]) == 0.))
         str += ' / whole acceptance rate = %.2f\n' % (1. - np.mean(np.diff(posterior_whole[int(i / 2.):i, 0]) == 0.))
-        str += 'mean(X) = %s' % pretty_array(posterior[int(i / 2.):i, :].mean(0))
+        str += 'mean($gamma$,a) = %s' % pretty_array(posterior[int(i / 2.):i, :].mean(0))
         str += ' / true mean = %s\n' % pretty_array(true_mean)
         # iqr = plt.sort(posterior[int(i / 2.):i, :], axis=0)[int(.25 * (i / 2.), .75 * (i / 2.)), :].T
         q75_1_i, q25_1_i = np.percentile(posterior[int(i / 2.):i, 0], [75, 25])

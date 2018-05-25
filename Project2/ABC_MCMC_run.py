@@ -1,5 +1,4 @@
 import numpy as np
-from IPython.core.pylabtools import figsize
 import matplotlib.pyplot as plt
 from Trait_sim_in_branches_stat import traitsim
 from ABC_MCMC import calibrication,MCMC_ABC
@@ -15,7 +14,7 @@ obs = traitsim(h = 1, num_iteration=1,num_species=10,gamma1=par_obs[0],gamma_K2=
 
 
 # Calibrication step
-cal_size = 100
+cal_size = 10000
 # Uniform prior distribution example
 priorpar = [0.0001,1,0.0001,1]
 collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs)
@@ -29,12 +28,12 @@ collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/priorresult/calibration2w.txt")
 
 
-
+collection = filtered_coll
 
 # distance distribution
 P.figure()
 dis_data = collection[:,[2,3]]
-n, bins, patches = P.hist(dis_data, 15, normed=1, histtype='bar',
+n, bins, patches = P.hist(dis_data, 15, density=1, histtype='bar',
                             color=['crimson', 'burlywood'],
                             label=['distance', 'sorted distance'])
 P.legend()
@@ -42,14 +41,14 @@ P.legend()
 # Estimate prior distribution of parameters
 # Generate random samples from a mixture of 2 Gaussians
 # with modes at 5 and 10
-data = np.array(collection[:,0])
+data = np.array(collection[:,1])
 data = data.reshape(-1,1)
 # Plot the true distribution
 x = np.linspace(0, 1, 100)[:, np.newaxis]
 norm_vals = mlab.normpdf(x, 0.1, 0.2)
 plt.plot(x, norm_vals)
 # Plot the data using a normalized histogram
-plt.hist(data, 50, normed=True)
+plt.hist(data, 50, density=True)
 # Do kernel density estimation
 kd = KernelDensity(kernel='gaussian', bandwidth=0.75).fit(data)
 # Plot the estimated densty
@@ -67,6 +66,8 @@ delta = np.sort(collection[:,3])[int(num)]
 mn,idx = min( (collection[i,3],i) for i in range(len(collection[:,3])) )
 startvalue_par = collection[idx,:2]
 
+filtered_coll = collection[collection[:,3]<=delta]
+
 # ABC_MCMC step
 iterations = 100
 
@@ -77,20 +78,14 @@ np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/posterior.txt",poster
 pm.autocorrplot(posterior)
 
 
-import pymc3 as pm
-with pm.Model() as model:
-    x = pm.Normal('x', shape=1)
-    tr = pm.sample(10000, step=pm.Metropolis())[5000::5]
-
-pm.autocorrplot(tr)
 # Statistic
-
+posterior = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/Normaldistributionresult/posterior_nor.txt")
 # Distribution plots for parameters
-gamma_samples = posterior[::10,0]
-a_samples = posterior[::10, 1]
-figdis = plt.figure()
-figsize(12, 8)
+gamma_samples = posterior[5000::,0]
+a_samples = posterior[5000::, 1]
+figdis = plt.figure(figsize=(12, 8))
 
+iterations = 20000
 plt.subplot(211)
 plt.title(r"""Distribution of $\gamma$ with %d samples""" % iterations)
 
@@ -109,8 +104,8 @@ plt.show()
 figdis.savefig('c:/Liang/Googlebox/Research/Project2/python_p2/posterior.png', dpi=figdis.dpi)
 
 # Trace plots
-figtra = plt.figure()
-figsize(12, 6)
+figtra = plt.figure(figsize=(12, 6))
+
 
 # Plot alpha trace
 plt.subplot(211)
@@ -126,11 +121,3 @@ plt.xlabel('Samples'); plt.ylabel('Parameter')
 plt.tight_layout(h_pad=0.8)
 plt.show()
 figtra.savefig('c:/Liang/Googlebox/Research/Project2/python_p2/posterior_trace.png', dpi=figtra.dpi)
-
-
-# self study
-cal_size = 10000
-# Uniform prior distribution example
-priorpar = [0.1,0.1]
-collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs,mode='self')
-np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/selfcal.txt",collection)
