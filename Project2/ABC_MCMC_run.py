@@ -15,17 +15,25 @@ obs = traitsim(h = 1, num_iteration=1,num_species=10,gamma1=par_obs[0],gamma_K2=
 
 # Calibrication step
 cal_size = 10000
-# Uniform prior distribution example
+# TEST1: Uniform prior distribution example
 priorpar = [0.0001,1,0.0001,1]
 collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs)
 # np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt")
-# Normal prior distribution example
+
+
+#TEST2: Normal prior distribution example
 priorpar = [0.1,0.2,0.1,0.3]
-collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs, mode = 'nor')
+# collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs, mode = 'nor')
 # np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
-# collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt")
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/priorresult/calibration2w.txt")
+
+#TEST3: Normal prior distribution with 3 MCMCs
+priorpar = [0.2,0.5,0.1,0.4]
+# collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs, mode = 'nor')
+# np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
+# collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/MCMC3/calibration2w_3chains.txt")
+
 
 
 collection = filtered_coll
@@ -45,7 +53,7 @@ data = np.array(collection[:,1])
 data = data.reshape(-1,1)
 # Plot the true distribution
 x = np.linspace(0, 1, 100)[:, np.newaxis]
-norm_vals = mlab.normpdf(x, 0.1, 0.2)
+norm_vals = mlab.normpdf(x, 0.1, 0.4)
 plt.plot(x, norm_vals)
 # Plot the data using a normalized histogram
 plt.hist(data, 50, density=True)
