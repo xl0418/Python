@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from JSAnimation import IPython_display
 
 np.random.seed(12)
-theta =   np.array([-60,-30,0,30,60])   # optimum of natural selection
+theta =   np.array([0])   # optimum of natural selection
 gamma = 0.01# intensity of natural selection
 r = 1  # growth rate
 a = 0.1 # intensity of competition
@@ -17,7 +17,7 @@ m = 1
 speciate_time = 1000
 extinction_time = 2000
 evo_time = 3000
-total_species = 15
+total_species = 10
 # gamma_K = gamma
 
 
@@ -76,8 +76,10 @@ trait_RI = np.zeros((evo_time + 1, total_species))
 population_RI = np.zeros((evo_time + 1, total_species))
 
 #  initialize condition for species trait and population
-mu_trait, sigma_trait = 0, 20  # mean and standard deviation
-trait_BH[0] = existing_species[0] * np.random.normal(mu_trait, sigma_trait, total_species)
+# mu_trait, sigma_trait = 0, 20  # mean and standard deviation
+# trait_BH[0] = existing_species[0] *  np.random.normal(mu_trait, sigma_trait, total_species)
+#Self distance study test
+trait_BH[0] = existing_species[0] * np.zeros(total_species)
 trait_RI[0] = trait_BH[0]
 print(trait_BH[0])
 print(trait_RI[0])

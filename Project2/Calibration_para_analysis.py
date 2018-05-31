@@ -25,6 +25,13 @@ priorpar = [0.2,0.5,0.1,0.4]
 # np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
 # collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/MCMC3/calibration2w_3chains.txt")
 
+cal_size = 100000
+# TEST4: Uniform prior distribution example
+priorpar = [0.0001,1,0.0001,1]
+collection = calibrication(samplesize = cal_size, priorpar = priorpar, obs = obs)
+# np.savetxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt",collection)
+# collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/testcal.txt")
+# collection = np.loadtxt("c:/Liang/Googlebox/Research/Project2/python_p2/Calibrtion10w_uni/calibration10w.txt")
 
 
 # Data filter

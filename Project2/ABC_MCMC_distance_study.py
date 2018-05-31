@@ -11,7 +11,7 @@ obs = traitsim(h = 1, num_iteration=1,num_species=10,gamma1=par_obs[0],gamma_K2=
                theta = 0,K = 5000 , mean_trait=0,dev_trait=20,mean_pop=50,dev_pop=20, num_time=2000,replicate=1)
 
 # self study
-cal_size = 5000
+cal_size = 100
 # Uniform prior distribution example
 # priorpar = [0.1,0.1]
 gamma_vec = np.array([0,0.001,0.01,0.1,0.5,1])

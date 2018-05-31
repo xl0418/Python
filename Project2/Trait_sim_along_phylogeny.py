@@ -2,29 +2,38 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-theta = 0   # optimum of natural selection
-gamma = 0.1 # intensity of natural selection
-r = 1  # growth rate
-a = 0 # intensity of competition
-K = 3000  # carrying capacity
 
-# Function ga: natural selection
+# Natural selection function
 def ga(gamma, theta, zi, r):
     return r * np.exp(-gamma * (theta - zi) ** 2)
 
-# Function beta: competition part
+# Dynamic carrying capacity
+def Kd(gamma_K, theta, zi, K):
+    return max(K * np.exp(-gamma_K * (theta - zi) ** 2),1)
+
+
+# Competition function
 def beta(a, zi, zj, nj):
     zi_ret = np.ndarray((1,len(zi)))
     for n1 in range(len(zi)):
         zi_ret[0,n1] = np.sum(np.exp(-a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
     return zi_ret
 
-# Function sigma: the derivative of beta with respect to zi
+# Derivative of the competition function
 def sigma(a, zi, zj, nj):
     zi_ret = np.ndarray((1, len(zi)))
     for n1 in range(len(zi)):
         zi_ret[0, n1] = np.sum(2 * a * (zi[n1]-np.array(zj)) * np.exp( -a * (zi[n1] - np.array(zj)) ** 2) * np.array(nj))
     return zi_ret
+
+
+theta = 0   # optimum of natural selection
+gamma = 0.1 # intensity of natural selection
+r = 1  # growth rate
+a = 0 # intensity of competition
+K = 3000  # carrying capacity
+
+
 # evolution time: speciation time
 speciate_time = 2000
 evo_time = 4000

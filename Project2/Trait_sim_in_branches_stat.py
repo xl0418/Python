@@ -70,6 +70,7 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
 
         # trait evolution simulation
         for i in range(num_time):
+            print(i)
             # RI dynamic r model
             Gamma_RI_dr = ga_vector(gamma=gamma1, theta=theta, zi=trait_RI_dr[i], r=r)
             K_RI_dr = K
@@ -80,7 +81,10 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
                                  + np.random.normal(0, delta_trait, num_species) )
             population_RI_dr[i + 1] = population_RI_dr[i] * np.exp(Gamma_RI_dr * (1 - Beta_RI_dr / K_RI_dr) \
                                       + np.random.normal(0, delta_pop, num_species))
-            population_RI_dr[i + 1, np.where(population_RI_dr[i + 1] < 1)] = 0
+            # population_RI_dr[i + 1, np.where(population_RI_dr[i + 1] < 1)] = 0
+            ext_index_RI_dr = np.where(population_RI_dr[i +1] == 0)[0]
+            if len(ext_index_RI_dr) > 0:
+                trait_RI_dr[i+1][ext_index_RI_dr] = 0
 
             #RI dynamic k model
             Gamma_RI = r
@@ -93,6 +97,9 @@ def traitsim(h,num_time, num_species, num_iteration, gamma1,gamma_K2, a, r, thet
             population_RI_dk[i+1] = population_RI_dk[i] * np.exp(Gamma_RI*(1-Beta_RI/K_RI)\
                               +  np.random.normal(0, delta_pop, num_species))
             population_RI_dk[i+1,np.where(population_RI_dk[i+1]<1)] = 0
+            ext_index_RI_dk = np.where(population_RI_dk[i + 1] == 0)[0]
+            if len(ext_index_RI_dk) > 0:
+                trait_RI_dk[i + 1][ext_index_RI_dk] = 0
 
         # Diversity statistics
         stat_rate_trait_RI_dr[j,:] =trait_RI_dr[num_time,:]
