@@ -2,14 +2,14 @@ import matplotlib.animation as animation
 from matplotlib.pylab import *
 import numpy as np
 import matplotlib.pyplot as plt
-from JSAnimation import IPython_display
+# from JSAnimation import IPython_display
 
 np.random.seed(12)
 theta =   np.array([0])   # optimum of natural selection
-gamma = 0.01# intensity of natural selection
+gamma = 0.1# intensity of natural selection
 r = 1  # growth rate
-a = 0.1 # intensity of competition
-K = 5000  # carrying capacity
+a = 1 # intensity of competition
+K = 50000  # carrying capacity
 # parameter controls the type of competition: 1, competition; -1 cooperation.
 m = 1
 
